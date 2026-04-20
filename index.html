@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS ARCADE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #08080f;
+            --bg2: #0e0e1a;
+            --card: #111125;
+            --card-hover: #191940;
+            --border: #252550;
+            --text: #e8e8f0;
+            --muted: #5a5a7a;
+            --accent: #00ff88;
+            --accent-glow: rgba(0,255,136,0.25);
+            --danger: #ff3366;
+            --warning: #ffaa00;
+            --info: #00d4ff;
+            --orange: #ff6633;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        h1,h2,h3,h4,h5 { font-family: 'Orbitron', sans-serif; }
+
+        /* Background */
+        #bgCanvas {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            z-index: 0; pointer-events: none;
+        }
+        .bg-orb {
+            position: fixed; border-radius: 50%; filter: blur(100px);
+            pointer-events: none; z-index: 0;
+        }
+        .bg-orb-1 {
+            width: 500px; height: 500px; top: -10%; left: -5%;
+            background: radial-gradient(circle, rgba(0,255,136,0.12), transparent 70%);
+            animation: orbFloat1 20s ease-in-out infinite;
+        }
+        .bg-orb-2 {
+            width: 400px; height: 400px; bottom: 10%; right: -5%;
+            background: radial-gradient(circle, rgba(255,51,102,0.1), transparent 70%);
+            animation: orbFloat2 25s ease-in-out infinite;
+        }
+        .bg-orb-3 {
+            width: 350px; height: 350px; top: 50%; left: 40%;
+            background: radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%);
+            animation: orbFloat3 18s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(80px,60px)} }
+        @keyframes orbFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,-80px)} }
+        @keyframes orbFloat3 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(50px,-40px)} 66%{transform:translate(-40px,50px)} }
+
+        /* Magic Cursor */
+        .cursor-dot {
+            position: fixed; width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); pointer-events: none; z-index: 10000;
+            transform: translate(-50%,-50%);
+            box-shadow: 0 0 15px var(--accent), 0 0 40px var(--accent-glow);
+            transition: width 0.15s, height 0.15s, background 0.15s;
+        }
+        .cursor-dot.clicking {
+            width: 16px; height: 16px;
+            background: var(--danger);
+            box-shadow: 0 0 20px var(--danger), 0 0 50px rgba(255,51,102,0.4);
+        }
+        .cursor-ring {
+            position: fixed; width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid rgba(0,255,136,0.4); pointer-events: none; z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s;
+        }
+        .cursor-ring.hovering {
+            width: 56px; height: 56px;
+            border-color: rgba(0,255,136,0.7);
+        }
+        .trail-particle {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 9998;
+            transform: translate(-50%,-50%);
+            animation: trailFade 0.5s ease-out forwards;
+        }
+        @keyframes trailFade {
+            0% { opacity: 0.8; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(0); }
+        }
+        .click-burst {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 9997;
+            transform: translate(-50%,-50%);
+            animation: burstOut 0.6s ease-out forwards;
+        }
+        @keyframes burstOut {
+            0% { opacity: 1; transform: translate(-50%,-50%) scale(0); }
+            100% { opacity: 0; transform: translate(var(--bx),var(--by)) scale(0.5); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed; top:0; left:0; right:0; z-index: 100;
+            backdrop-filter: blur(20px); background: rgba(8,8,15,0.7);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0.8rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif; font-weight: 900;
+            font-size: 1.2rem; color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+            letter-spacing: 3px;
+        }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--muted); text-decoration: none; font-weight: 600;
+            font-size: 0.95rem; letter-spacing: 1px; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-btn {
+            background: transparent; border: 1.5px solid var(--accent);
+            color: var(--accent); padding: 0.4rem 1.2rem; border-radius: 4px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+            letter-spacing: 2px; transition: all 0.3s; cursor: none;
+        }
+        .nav-btn:hover {
+            background: var(--accent); color: var(--bg);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 2rem;
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 900;
+            letter-spacing: 6px; line-height: 1.1;
+            background: linear-gradient(135deg, #00ff88, #00d4ff, #00ff88);
+            background-size: 200% 200%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradShift 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(0,255,136,0.3));
+        }
+        @keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        .hero-sub {
+            font-size: clamp(1rem, 2.5vw, 1.4rem); color: var(--muted);
+            margin-top: 1.2rem; font-weight: 400; letter-spacing: 2px;
+        }
+        .hero-cta {
+            margin-top: 2.5rem; display: inline-flex; align-items: center; gap: 0.7rem;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #080810; padding: 0.9rem 2.5rem; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700;
+            font-size: 0.9rem; letter-spacing: 3px; text-decoration: none;
+            border: none; cursor: none;
+            box-shadow: 0 0 30px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.4);
+            transition: all 0.3s; animation: ctaPulse 2s ease-in-out infinite;
+        }
+        @keyframes ctaPulse {
+            0%,100%{box-shadow: 0 0 30px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.4)}
+            50%{box-shadow: 0 0 50px rgba(0,255,136,0.4), 0 4px 20px rgba(0,0,0,0.5)}
+        }
+        .hero-cta:hover { transform: translateY(-2px) scale(1.03); }
+        .hero-stats {
+            display: flex; gap: 3rem; margin-top: 3rem;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-num {
+            font-family: 'Orbitron', sans-serif; font-size: 2rem;
+            font-weight: 900; color: var(--accent);
+        }
+        .hero-stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Games Section */
+        .games-section {
+            position: relative; z-index: 1;
+            max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem 6rem;
+        }
+        .section-title {
+            text-align: center; font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 700; letter-spacing: 4px; margin-bottom: 0.6rem;
+        }
+        .section-sub {
+            text-align: center; color: var(--muted); font-size: 1.05rem;
+            margin-bottom: 3rem; letter-spacing: 1px;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .game-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 2rem; position: relative;
+            overflow: hidden; transition: all 0.4s;
+        }
+        .game-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--card-accent); opacity: 0; transition: opacity 0.4s;
+        }
+        .game-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-accent);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px var(--card-glow);
+        }
+        .game-card:hover::before { opacity: 1; }
+        .card-icon {
+            width: 56px; height: 56px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1.2rem;
+            background: var(--card-icon-bg);
+            color: var(--card-accent);
+        }
+        .card-title {
+            font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0.5rem;
+        }
+        .card-desc { color: var(--muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+        .card-play {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: transparent; border: 1.5px solid var(--card-accent);
+            color: var(--card-accent); padding: 0.5rem 1.5rem; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            letter-spacing: 2px; transition: all 0.3s; cursor: none;
+        }
+        .card-play:hover {
+            background: var(--card-accent); color: var(--bg);
+            box-shadow: 0 0 20px var(--card-glow);
+        }
+
+        /* Modal */
+        .game-modal {
+            position: fixed; top:0; left:0; right:0; bottom:0; z-index: 200;
+            display: none; align-items: center; justify-content: center;
+        }
+        .game-modal.active { display: flex; }
+        .modal-overlay {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: rgba(4,4,8,0.85); backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        .modal-content {
+            position: relative; background: var(--bg2);
+            border: 1px solid var(--border); border-radius: 16px;
+            width: 90%; max-width: 560px; max-height: 90vh;
+            overflow-y: auto; animation: modalSlide 0.4s ease;
+        }
+        @keyframes modalSlide { from{opacity:0;transform:translateY(30px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
+        }
+        .modal-header h2 { font-size: 1rem; letter-spacing: 3px; font-weight: 700; }
+        .modal-close {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: var(--muted); font-size: 1rem; cursor: none;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .modal-close:hover { background: rgba(255,51,102,0.15); color: var(--danger); border-color: var(--danger); }
+        .modal-body { padding: 1.5rem; }
+
+        /* Game screens */
+        .game-screen { display: none; }
+        .game-screen.active { display: flex; flex-direction: column; align-items: center; }
+        .game-screen-title {
+            font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
+            letter-spacing: 2px; color: var(--muted); margin-bottom: 1rem;
+        }
+        .game-info-text {
+            color: var(--muted); font-size: 0.95rem; text-align: center;
+            margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .game-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #080810; padding: 0.7rem 2rem; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700;
+            font-size: 0.75rem; letter-spacing: 2px; border: none; cursor: none;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: all 0.3s;
+        }
+        .game-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,255,136,0.4); }
+        .game-btn-secondary {
+            background: transparent; border: 1.5px solid var(--border);
+            color: var(--text); padding: 0.5rem 1.5rem; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            letter-spacing: 2px; cursor: none; transition: all 0.3s;
+            margin-top: 0.7rem;
+        }
+        .game-btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .game-hud {
+            display: flex; justify-content: space-between; width: 100%;
+            padding: 0.5rem 0; margin-bottom: 0.7rem;
+            font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+            letter-spacing: 1px; color: var(--muted);
+        }
+        .game-hud span { color: var(--accent); font-weight: 700; }
+        .game-canvas {
+            border-radius: 8px; border: 1px solid var(--border);
+            display: block; background: #0a0a18;
+        }
+        .game-over-score {
+            font-family: 'Orbitron', sans-serif; font-size: 3rem;
+            font-weight: 900; color: var(--accent); margin: 0.5rem 0;
+        }
+        .game-over-label {
+            font-size: 1rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 0.3rem;
+        }
+
+        /* Touch controls for snake */
+        .touch-controls {
+            display: none; margin-top: 1rem;
+            flex-direction: column; align-items: center; gap: 0.3rem;
+        }
+        .touch-row { display: flex; gap: 0.3rem; }
+        .touch-btn {
+            width: 52px; height: 52px; border-radius: 8px;
+            background: var(--card); border: 1px solid var(--border);
+            color: var(--text); font-size: 1.2rem; cursor: none;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .touch-btn:active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        @media (hover:none) and (pointer:coarse) {
+            .touch-controls { display: flex; }
+            body { cursor: auto; }
+            .cursor-dot, .cursor-ring { display: none !important; }
+            .trail-particle, .click-burst { display: none !important; }
+        }
+
+        /* Memory Game */
+        .memory-grid {
+            display: grid; grid-template-columns: repeat(4,1fr);
+            gap: 0.6rem; width: 100%; max-width: 380px;
+        }
+        .memory-card {
+            aspect-ratio: 1; border-radius: 10px;
+            background: var(--card); border: 1.5px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; cursor: none;
+            transition: all 0.4s; transform-style: preserve-3d;
+            position: relative;
+        }
+        .memory-card.flipped { border-color: var(--info); background: rgba(0,212,255,0.08); }
+        .memory-card.matched { border-color: var(--accent); background: rgba(0,255,136,0.08); opacity: 0.7; pointer-events: none; }
+        .memory-card .card-front { display: none; }
+        .memory-card .card-back { color: var(--muted); font-size: 1.4rem; }
+        .memory-card.flipped .card-front { display: block; }
+        .memory-card.flipped .card-back { display: none; }
+
+        /* Tic Tac Toe */
+        .ttt-grid {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 0.5rem; width: 100%; max-width: 300px;
+        }
+        .ttt-cell {
+            aspect-ratio: 1; border-radius: 10px;
+            background: var(--card); border: 1.5px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif; font-size: 2.2rem;
+            font-weight: 900; cursor: none; transition: all 0.3s;
+        }
+        .ttt-cell:hover:not(.taken) { border-color: var(--warning); background: rgba(255,170,0,0.05); }
+        .ttt-cell.x-mark { color: var(--accent); }
+        .ttt-cell.o-mark { color: var(--danger); }
+        .ttt-cell.win-cell { border-color: var(--accent); background: rgba(0,255,136,0.1); box-shadow: 0 0 20px var(--accent-glow); }
+        .ttt-scores {
+            display: flex; gap: 1.5rem; margin-bottom: 1rem;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 1px;
+        }
+        .ttt-scores div { text-align: center; }
+        .ttt-scores .label { color: var(--muted); margin-bottom: 0.2rem; }
+        .ttt-scores .val { font-size: 1.2rem; font-weight: 700; }
+
+        /* Reaction Game */
+        .reaction-zone {
+            width: 100%; height: 280px; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; transition: all 0.15s;
+            border: 2px solid var(--border); cursor: none;
+            user-select: none;
+        }
+        .reaction-zone.waiting { background: rgba(255,51,102,0.1); border-color: var(--danger); }
+        .reaction-zone.ready { background: rgba(0,255,136,0.15); border-color: var(--accent); }
+        .reaction-zone.result { background: var(--card); border-color: var(--border); }
+        .reaction-zone.too-early { background: rgba(255,170,0,0.1); border-color: var(--warning); }
+        .reaction-zone.idle { background: var(--card); }
+        .reaction-text {
+            font-family: 'Orbitron', sans-serif; font-size: 1.1rem;
+            letter-spacing: 2px; font-weight: 700;
+        }
+        .reaction-time {
+            font-family: 'Orbitron', sans-serif; font-size: 3.5rem;
+            font-weight: 900; color: var(--accent); margin: 0.5rem 0;
+        }
+        .reaction-unit { font-size: 0.8rem; color: var(--muted); letter-spacing: 2px; }
+        .reaction-best { font-size: 0.8rem; color: var(--warning); margin-top: 0.8rem; letter-spacing: 1px; }
+
+        /* Footer */
+        footer {
+            position: relative; z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 2rem 1.5rem; text-align: center;
+            color: var(--muted); font-size: 0.85rem;
+        }
+        footer span { color: var(--accent); font-weight: 600; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <canvas id="bgCanvas"></canvas>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <!-- Magic Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <div class="nav-logo">NEXUS ARCADE</div>
+            <div class="nav-links">
+                <a href="#games">Games</a>
+                <a href="#about">About</a>
+                <button class="nav-btn" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">PLAY NOW</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <h1 class="hero-title">NEXUS ARCADE</h1>
+        <p class="hero-sub">Five games. Zero downloads. Pure adrenaline.</p>
+        <a href="#games" class="hero-cta"><i class="fas fa-gamepad"></i> ENTER THE ARCADE</a>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-num">5</div>
+                <div class="hero-stat-label">Games</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">1M+</div>
+                <div class="hero-stat-label">Users</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">&infin;</div>
+                <div class="hero-stat-label">Fun</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Games Section -->
+    <section class="games-section" id="games">
+        <h2 class="section-title">CHOOSE YOUR BATTLE</h2>
+        <p class="section-sub">Select a game below to start playing instantly</p>
+        <div class="games-grid">
+            <!-- Snake -->
+            <div class="game-card" style="--card-accent:#00ff88;--card-glow:rgba(0,255,136,0.15);--card-icon-bg:rgba(0,255,136,0.1)">
+                <div class="card-icon"><i class="fas fa-worm"></i></div>
+                <h3 class="card-title">SNAKE</h3>
+                <p class="card-desc">Guide the snake to eat food and grow longer. Avoid hitting walls or yourself. How long can you survive?</p>
+                <button class="card-play" onclick="ModalManager.open('snake')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Memory -->
+            <div class="game-card" style="--card-accent:#00d4ff;--card-glow:rgba(0,212,255,0.15);--card-icon-bg:rgba(0,212,255,0.1)">
+                <div class="card-icon"><i class="fas fa-brain"></i></div>
+                <h3 class="card-title">MEMORY MATCH</h3>
+                <p class="card-desc">Flip cards and find matching pairs. Test your memory with 8 pairs of symbols. Fewer moves means a sharper mind.</p>
+                <button class="card-play" onclick="ModalManager.open('memory')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Breakout -->
+            <div class="game-card" style="--card-accent:#ff3366;--card-glow:rgba(255,51,102,0.15);--card-icon-bg:rgba(255,51,102,0.1)">
+                <div class="card-icon"><i class="fas fa-table-cells"></i></div>
+                <h3 class="card-title">BRICK BREAKER</h3>
+                <p class="card-desc">Smash through layers of bricks with a bouncing ball. Keep the ball alive with your paddle. Clear all bricks to win.</p>
+                <button class="card-play" onclick="ModalManager.open('breakout')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Tic Tac Toe -->
+            <div class="game-card" style="--card-accent:#ffaa00;--card-glow:rgba(255,170,0,0.15);--card-icon-bg:rgba(255,170,0,0.1)">
+                <div class="card-icon"><i class="fas fa-hashtag"></i></div>
+                <h3 class="card-title">TIC TAC TOE</h3>
+                <p class="card-desc">Classic strategy against an AI opponent. You play as X, the AI plays as O. Can you outsmart the machine?</p>
+                <button class="card-play" onclick="ModalManager.open('ttt')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Reaction -->
+            <div class="game-card" style="--card-accent:#ff6633;--card-glow:rgba(255,102,51,0.15);--card-icon-bg:rgba(255,102,51,0.1)">
+                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="card-title">REACTION TEST</h3>
+                <p class="card-desc">Wait for the green signal, then click as fast as you can. Measure your reaction time in milliseconds.</p>
+                <button class="card-play" onclick="ModalManager.open('reaction')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" style="position:relative;z-index:1;max-width:700px;margin:0 auto;padding:2rem 1.5rem 5rem;text-align:center;">
+        <h2 class="section-title">ABOUT NEXUS ARCADE</h2>
+        <p class="section-sub" style="margin-top:1rem;line-height:1.8;">
+            Nexus Arcade is a browser-based gaming hub where every game loads instantly with zero installs.
+            Built with pure HTML, CSS, and JavaScript — no frameworks, no dependencies, no excuses.
+            Just pick a game and play.<br><br>
+            Contact us at: <a href="mailto:bhupendrasinghkuchaman@gmail.com">bhupendrasinghkuchaman@gmail.com</a>
+            <p>Call us at: <a href="tel:91 8949641283">+91 8949641283</a></p>
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        Built with raw code<span></span>. All games run entirely in your browser, no downloads required. &copy; 2026 Nexus Arcade.
+    </footer>
+
+    <!-- ==================== GAME MODALS ==================== -->
+
+    <!-- SNAKE MODAL -->
+    <div class="game-modal" id="snakeModal">
+        <div class="modal-overlay" onclick="ModalManager.close('snake')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#00ff88">SNAKE</h2>
+                <button class="modal-close" onclick="ModalManager.close('snake')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <!-- Start -->
+                <div class="game-screen active" id="snakeStart">
+                    <p class="game-info-text">Use <strong style="color:var(--accent)">arrow keys</strong> to control the snake. Eat the green food to grow. Don't hit the walls or yourself!</p>
+                    <button class="game-btn" onclick="SnakeGame.start()">START GAME</button>
+                </div>
+                <!-- Play -->
+                <div class="game-screen" id="snakePlay">
+                    <div class="game-hud">
+                        <div>SCORE: <span id="snakeScore">0</span></div>
+                        <div>BEST: <span id="snakeBest">0</span></div>
+                    </div>
+                    <canvas id="snakeCanvas" class="game-canvas" width="400" height="400"></canvas>
+                    <div class="touch-controls">
+                        <div class="touch-row"><button class="touch-btn" ontouchstart="SnakeGame.setDir('up')" onclick="SnakeGame.setDir('up')"><i class="fas fa-chevron-up"></i></button></div>
+                        <div class="touch-row">
+                            <button class="touch-btn" ontouchstart="SnakeGame.setDir('left')" onclick="SnakeGame.setDir('left')"><i class="fas fa-chevron-left"></i></button>
+                            <button class="touch-btn" ontouchstart="SnakeGame.setDir('down')" onclick="SnakeGame.setDir('down')"><i class="fas fa-chevron-down"></i></button>
+                            <button class="touch-btn" ontouchstart="SnakeGame.setDir('right')" onclick="SnakeGame.setDir('right')"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Over -->
+                <div class="game-screen" id="snakeOver">
+                    <div class="game-over-label" style="color:var(--danger)">GAME OVER</div>
+                    <div class="game-over-score" id="snakeFinalScore">0</div>
+                    <div class="game-over-label">POINTS</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="SnakeGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('snake')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMORY MODAL -->
+    <div class="game-modal" id="memoryModal">
+        <div class="modal-overlay" onclick="ModalManager.close('memory')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#00d4ff">MEMORY MATCH</h2>
+                <button class="modal-close" onclick="ModalManager.close('memory')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="memoryStart">
+                    <p class="game-info-text">Flip two cards at a time to find matching pairs. Match all 8 pairs in the fewest moves possible.</p>
+                    <button class="game-btn" onclick="MemoryGame.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="memoryPlay">
+                    <div class="game-hud">
+                        <div>MOVES: <span id="memoryMoves">0</span></div>
+                        <div>PAIRS: <span id="memoryPairs">0</span>/8</div>
+                        <div>TIME: <span id="memoryTime">0:00</span></div>
+                    </div>
+                    <div class="memory-grid" id="memoryGrid"></div>
+                </div>
+                <div class="game-screen" id="memoryOver">
+                    <div class="game-over-label" style="color:#00d4ff">ALL PAIRS FOUND</div>
+                    <div class="game-over-score" id="memoryFinalMoves">0</div>
+                    <div class="game-over-label">MOVES</div>
+                    <div style="margin-top:0.5rem;color:var(--muted);font-size:0.9rem">Time: <span id="memoryFinalTime" style="color:var(--accent)">0:00</span></div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="MemoryGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('memory')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BREAKOUT MODAL -->
+    <div class="game-modal" id="breakoutModal">
+        <div class="modal-overlay" onclick="ModalManager.close('breakout')"></div>
+        <div class="modal-content" style="max-width:540px">
+            <div class="modal-header">
+                <h2 style="color:#ff3366">BRICK BREAKER</h2>
+                <button class="modal-close" onclick="ModalManager.close('breakout')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="breakoutStart">
+                    <p class="game-info-text">Move your <strong style="color:var(--danger)">mouse</strong> (or finger) to control the paddle. Break all the bricks to win. You have 3 lives.</p>
+                    <button class="game-btn" onclick="BreakoutGame.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="breakoutPlay">
+                    <div class="game-hud">
+                        <div>SCORE: <span id="breakoutScore">0</span></div>
+                        <div>LIVES: <span id="breakoutLives">3</span></div>
+                    </div>
+                    <canvas id="breakoutCanvas" class="game-canvas" width="480" height="380"></canvas>
+                </div>
+                <div class="game-screen" id="breakoutOver">
+                    <div class="game-over-label" id="breakoutOverLabel" style="color:var(--danger)">GAME OVER</div>
+                    <div class="game-over-score" id="breakoutFinalScore">0</div>
+                    <div class="game-over-label">POINTS</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="BreakoutGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('breakout')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIC TAC TOE MODAL -->
+    <div class="game-modal" id="tttModal">
+        <div class="modal-overlay" onclick="ModalManager.close('ttt')"></div>
+        <div class="modal-content" style="max-width:420px">
+            <div class="modal-header">
+                <h2 style="color:#ffaa00">TIC TAC TOE</h2>
+                <button class="modal-close" onclick="ModalManager.close('ttt')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="tttStart">
+                    <p class="game-info-text">You are <strong style="color:var(--accent)">X</strong>, the AI is <strong style="color:var(--danger)">O</strong>. Click a cell to place your mark. Get three in a row to win.</p>
+                    <button class="game-btn" onclick="TicTacToe.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="tttPlay">
+                    <div class="ttt-scores">
+                        <div><div class="label">YOU (X)</div><div class="val" style="color:var(--accent)" id="tttScoreX">0</div></div>
+                        <div><div class="label">DRAWS</div><div class="val" style="color:var(--muted)" id="tttScoreD">0</div></div>
+                        <div><div class="label">AI (O)</div><div class="val" style="color:var(--danger)" id="tttScoreO">0</div></div>
+                    </div>
+                    <div id="tttStatus" style="font-family:'Orbitron';font-size:0.75rem;letter-spacing:2px;color:var(--accent);margin-bottom:0.8rem">YOUR TURN</div>
+                    <div class="ttt-grid" id="tttGrid"></div>
+                    <button class="game-btn-secondary" style="margin-top:1rem" onclick="TicTacToe.nextRound()">NEXT ROUND</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REACTION MODAL -->
+    <div class="game-modal" id="reactionModal">
+        <div class="modal-overlay" onclick="ModalManager.close('reaction')"></div>
+        <div class="modal-content" style="max-width:440px">
+            <div class="modal-header">
+                <h2 style="color:#ff6633">REACTION TEST</h2>
+                <button class="modal-close" onclick="ModalManager.close('reaction')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="reactionPlay">
+                    <div class="reaction-zone idle" id="reactionZone" onclick="ReactionGame.handleClick()">
+                        <div class="reaction-text" id="reactionText" style="color:var(--muted)">CLICK TO BEGIN</div>
+                    </div>
+                    <div class="reaction-best" id="reactionBest"></div>
+                    <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center" id="reactionHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* ============================
+       BACKGROUND PARTICLE SYSTEM
+    ============================ */
+    const BgParticles = {
+        canvas: null, ctx: null, particles: [], mouse: {x:-9999,y:-9999},
+        init() {
+            this.canvas = document.getElementById('bgCanvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+            document.addEventListener('mousemove', e => { this.mouse.x = e.clientX; this.mouse.y = e.clientY; });
+            for (let i = 0; i < 70; i++) this.particles.push(this.createParticle());
+            this.animate();
+        },
+        resize() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        },
+        createParticle() {
+            return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                r: Math.random() * 1.8 + 0.5,
+                o: Math.random() * 0.5 + 0.1
+            };
+        },
+        animate() {
+            const {canvas, ctx, particles, mouse} = this;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const p of particles) {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0,255,136,${p.o})`;
+                ctx.fill();
+            }
+            // Connection lines
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0,255,136,${0.08 * (1 - dist/120)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+                // Mouse interaction
+                const dx = particles[i].x - mouse.x;
+                const dy = particles[i].y - mouse.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 160) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(mouse.x, mouse.y);
+                    ctx.strokeStyle = `rgba(0,255,136,${0.15 * (1 - dist/160)})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+            requestAnimationFrame(() => this.animate());
+        }
+    };
+
+    /* ============================
+       MAGIC CURSOR
+    ============================ */
+    const MagicCursor = {
+        dot: null, ring: null, mx: 0, my: 0, rx: 0, ry: 0,
+        trailTimer: 0,
+        init() {
+            if ('ontouchstart' in window) return;
+            this.dot = document.getElementById('cursorDot');
+            this.ring = document.getElementById('cursorRing');
+            document.addEventListener('mousemove', e => {
+                this.mx = e.clientX; this.my = e.clientY;
+                this.dot.style.left = this.mx + 'px';
+                this.dot.style.top = this.my + 'px';
+                this.trailTimer++;
+                if (this.trailTimer % 2 === 0) this.spawnTrail(this.mx, this.my);
+            });
+            document.addEventListener('mousedown', () => {
+                this.dot.classList.add('clicking');
+                this.spawnBurst(this.mx, this.my);
+            });
+            document.addEventListener('mouseup', () => this.dot.classList.remove('clicking'));
+            // Hover detection for interactive elements
+            document.addEventListener('mouseover', e => {
+                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn')) {
+                    this.ring.classList.add('hovering');
+                }
+            });
+            document.addEventListener('mouseout', e => {
+                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn')) {
+                    this.ring.classList.remove('hovering');
+                }
+            });
+            this.followRing();
+        },
+        followRing() {
+            this.rx += (this.mx - this.rx) * 0.15;
+            this.ry += (this.my - this.ry) * 0.15;
+            this.ring.style.left = this.rx + 'px';
+            this.ring.style.top = this.ry + 'px';
+            requestAnimationFrame(() => this.followRing());
+        },
+        spawnTrail(x, y) {
+            const el = document.createElement('div');
+            el.className = 'trail-particle';
+            const size = Math.random() * 5 + 3;
+            const hue = Math.random() > 0.5 ? '155' : '170';
+            el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:hsla(${hue},100%,60%,0.6)`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 500);
+        },
+        spawnBurst(x, y) {
+            for (let i = 0; i < 8; i++) {
+                const el = document.createElement('div');
+                el.className = 'click-burst';
+                const angle = (Math.PI * 2 / 8) * i;
+                const dist = 30 + Math.random() * 20;
+                const bx = Math.cos(angle) * dist;
+                const by = Math.sin(angle) * dist;
+                const size = Math.random() * 6 + 4;
+                el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:var(--accent);--bx:${bx}px;--by:${by}px`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 600);
+            }
+        }
+    };
+
+    /* ============================
+       MODAL MANAGER
+    ============================ */
+    const ModalManager = {
+        current: null,
+        open(id) {
+            this.close();
+            const modal = document.getElementById(id + 'Modal');
+            if (modal) {
+                modal.classList.add('active');
+                this.current = id;
+                document.body.style.overflow = 'hidden';
+            }
+        },
+        close(id) {
+            const target = id || this.current;
+            if (!target) return;
+            const modal = document.getElementById(target + 'Modal');
+            if (modal) modal.classList.remove('active');
+            // Stop game
+            if (target === 'snake') SnakeGame.stop();
+            if (target === 'memory') MemoryGame.stop();
+            if (target === 'breakout') BreakoutGame.stop();
+            if (target === 'reaction') ReactionGame.stop();
+            if (target === 'ttt') TicTacToe.stop();
+            this.current = null;
+            document.body.style.overflow = '';
+        }
+    };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') ModalManager.close(); });
+
+    /* ============================
+       UTILITY
+    ============================ */
+    function showScreen(id) {
+        const parent = document.getElementById(id).parentElement;
+        parent.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    /* ============================
+       SNAKE GAME
+    ============================ */
+    const SnakeGame = {
+        canvas: null, ctx: null, interval: null, state: 'idle',
+        snake: [], food: null, dir: 'right', nextDir: 'right',
+        score: 0, best: 0, speed: 140, gridSize: 20,
+        init() {
+            this.canvas = document.getElementById('snakeCanvas');
+            this.ctx = this.canvas.getContext('2d');
+        },
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.score = 0;
+            this.speed = 140;
+            this.dir = 'right'; this.nextDir = 'right';
+            this.snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+            this.spawnFood();
+            document.getElementById('snakeScore').textContent = '0';
+            document.getElementById('snakeBest').textContent = this.best;
+            showScreen('snakePlay');
+            this.interval = setInterval(() => this.update(), this.speed);
+            this.draw();
+        },
+        stop() {
+            if (this.interval) { clearInterval(this.interval); this.interval = null; }
+            this.state = 'idle';
+        },
+        restart() { this.start(); },
+        setDir(d) {
+            const opp = {up:'down',down:'up',left:'right',right:'left'};
+            if (d !== opp[this.dir]) this.nextDir = d;
+        },
+        spawnFood() {
+            let pos;
+            do {
+                pos = { x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20) };
+            } while (this.snake.some(s => s.x === pos.x && s.y === pos.y));
+            this.food = pos;
+        },
+        update() {
+            this.dir = this.nextDir;
+            const head = {...this.snake[0]};
+            if (this.dir === 'up') head.y--;
+            if (this.dir === 'down') head.y++;
+            if (this.dir === 'left') head.x--;
+            if (this.dir === 'right') head.x++;
+            // Wall collision
+            if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) { this.gameOver(); return; }
+            // Self collision
+            if (this.snake.some(s => s.x === head.x && s.y === head.y)) { this.gameOver(); return; }
+            this.snake.unshift(head);
+            if (head.x === this.food.x && head.y === this.food.y) {
+                this.score += 10;
+                document.getElementById('snakeScore').textContent = this.score;
+                this.spawnFood();
+                // Speed up
+                if (this.speed > 60) {
+                    this.speed -= 4;
+                    clearInterval(this.interval);
+                    this.interval = setInterval(() => this.update(), this.speed);
+                }
+            } else {
+                this.snake.pop();
+            }
+            this.draw();
+        },
+        draw() {
+            const {ctx, canvas, gridSize: g} = this;
+            ctx.fillStyle = '#0a0a18';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Grid lines (subtle)
+            ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= 20; i++) {
+                ctx.beginPath(); ctx.moveTo(i*g, 0); ctx.lineTo(i*g, 400); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i*g); ctx.lineTo(400, i*g); ctx.stroke();
+            }
+            // Food
+            if (this.food) {
+                const fx = this.food.x * g + g/2, fy = this.food.y * g + g/2;
+                ctx.beginPath();
+                ctx.arc(fx, fy, g/2 - 2, 0, Math.PI*2);
+                ctx.fillStyle = '#00ff88';
+                ctx.shadowColor = '#00ff88'; ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            // Snake
+            for (let i = this.snake.length - 1; i >= 0; i--) {
+                const s = this.snake[i];
+                const alpha = 1 - (i / this.snake.length) * 0.6;
+                const r = Math.max(1, g/2 - 2 - (i * 0.3));
+                ctx.beginPath();
+                ctx.roundRect(s.x*g+1, s.y*g+1, g-2, g-2, 4);
+                ctx.fillStyle = i === 0 ? '#00ff88' : `rgba(0,255,136,${alpha})`;
+                if (i === 0) { ctx.shadowColor = '#00ff88'; ctx.shadowBlur = 10; }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        },
+        gameOver() {
+            this.stop();
+            this.state = 'over';
+            if (this.score > this.best) this.best = this.score;
+            document.getElementById('snakeFinalScore').textContent = this.score;
+            showScreen('snakeOver');
+        }
+    };
+    document.addEventListener('keydown', e => {
+        if (SnakeGame.state !== 'playing') return;
+        const map = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
+        if (map[e.key]) { SnakeGame.setDir(map[e.key]); e.preventDefault(); }
+    });
+
+    /* ============================
+       MEMORY MATCH GAME
+    ============================ */
+    const MemoryGame = {
+        icons: ['fa-heart','fa-star','fa-bolt','fa-fire','fa-gem','fa-crown','fa-moon','fa-sun'],
+        colors: ['#ff3366','#ffaa00','#00ff88','#ff6633','#00d4ff','#ff66ff','#88aaff','#ff8844'],
+        cards: [], flipped: [], matched: 0, moves: 0, timer: null, seconds: 0, locked: false,
+        init() {},
+        start() {
+            this.stop();
+            this.matched = 0; this.moves = 0; this.seconds = 0; this.locked = false; this.flipped = [];
+            document.getElementById('memoryMoves').textContent = '0';
+            document.getElementById('memoryPairs').textContent = '0';
+            document.getElementById('memoryTime').textContent = '0:00';
+            // Build card array
+            let pairs = [];
+            for (let i = 0; i < 8; i++) {
+                pairs.push({icon: this.icons[i], color: this.colors[i], id: i});
+                pairs.push({icon: this.icons[i], color: this.colors[i], id: i});
+            }
+            this.cards = this.shuffle(pairs);
+            this.renderGrid();
+            showScreen('memoryPlay');
+            this.timer = setInterval(() => {
+                this.seconds++;
+                const m = Math.floor(this.seconds/60);
+                const s = this.seconds % 60;
+                document.getElementById('memoryTime').textContent = m + ':' + String(s).padStart(2,'0');
+            }, 1000);
+        },
+        stop() {
+            if (this.timer) { clearInterval(this.timer); this.timer = null; }
+            this.locked = false;
+        },
+        restart() { this.start(); },
+        shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        },
+        renderGrid() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            this.cards.forEach((card, idx) => {
+                const el = document.createElement('div');
+                el.className = 'memory-card';
+                el.innerHTML = `<i class="fas ${card.icon} card-front" style="color:${card.color}"></i><i class="fas fa-question card-back"></i>`;
+                el.addEventListener('click', () => this.flipCard(idx, el));
+                grid.appendChild(el);
+            });
+        },
+        flipCard(idx, el) {
+            if (this.locked || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+            el.classList.add('flipped');
+            this.flipped.push({idx, el, id: this.cards[idx].id});
+            if (this.flipped.length === 2) {
+                this.moves++;
+                document.getElementById('memoryMoves').textContent = this.moves;
+                this.locked = true;
+                const [a, b] = this.flipped;
+                if (a.id === b.id) {
+                    a.el.classList.add('matched');
+                    b.el.classList.add('matched');
+                    this.matched++;
+                    document.getElementById('memoryPairs').textContent = this.matched;
+                    this.flipped = [];
+                    this.locked = false;
+                    if (this.matched === 8) this.win();
+                } else {
+                    setTimeout(() => {
+                        a.el.classList.remove('flipped');
+                        b.el.classList.remove('flipped');
+                        this.flipped = [];
+                        this.locked = false;
+                    }, 700);
+                }
+            }
+        },
+        win() {
+            this.stop();
+            const m = Math.floor(this.seconds/60);
+            const s = this.seconds % 60;
+            document.getElementById('memoryFinalMoves').textContent = this.moves;
+            document.getElementById('memoryFinalTime').textContent = m + ':' + String(s).padStart(2,'0');
+            setTimeout(() => showScreen('memoryOver'), 500);
+        }
+    };
+
+    /* ============================
+       BRICK BREAKER GAME
+    ============================ */
+    const BreakoutGame = {
+        canvas: null, ctx: null, animFrame: null, state: 'idle',
+        paddle: {x:0, w:80, h:12}, ball: {x:0,y:0,dx:0,dy:0,r:6},
+        bricks: [], score: 0, lives: 3,
+        brickRows: 5, brickCols: 8, brickW: 52, brickH: 18, brickPad: 4, brickTop: 40,
+        init() {
+            this.canvas = document.getElementById('breakoutCanvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.canvas.addEventListener('mousemove', e => {
+                if (this.state !== 'playing') return;
+                const rect = this.canvas.getBoundingClientRect();
+                this.paddle.x = Math.max(0, Math.min(this.canvas.width - this.paddle.w, (e.clientX - rect.left) * (this.canvas.width / rect.width) - this.paddle.w/2));
+            });
+            this.canvas.addEventListener('touchmove', e => {
+                if (this.state !== 'playing') return;
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                this.paddle.x = Math.max(0, Math.min(this.canvas.width - this.paddle.w, (touch.clientX - rect.left) * (this.canvas.width / rect.width) - this.paddle.w/2));
+            }, {passive: false});
+        },
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.score = 0; this.lives = 3;
+            document.getElementById('breakoutScore').textContent = '0';
+            document.getElementById('breakoutLives').textContent = '3';
+            this.paddle.x = (this.canvas.width - this.paddle.w) / 2;
+            this.resetBall();
+            this.buildBricks();
+            showScreen('breakoutPlay');
+            this.loop();
+        },
+        stop() {
+            if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
+            this.state = 'idle';
+        },
+        restart() { this.start(); },
+        resetBall() {
+            this.ball.x = this.canvas.width / 2;
+            this.ball.y = this.canvas.height - 50;
+            const angle = -Math.PI/2 + (Math.random()-0.5)*0.8;
+            const speed = 4;
+            this.ball.dx = Math.cos(angle) * speed;
+            this.ball.dy = Math.sin(angle) * speed;
+        },
+        buildBricks() {
+            this.bricks = [];
+            const colors = ['#ff3366','#ff6633','#ffaa00','#00ff88','#00d4ff'];
+            const totalW = this.brickCols * (this.brickW + this.brickPad) - this.brickPad;
+            const offset = (this.canvas.width - totalW) / 2;
+            for (let r = 0; r < this.brickRows; r++) {
+                for (let c = 0; c < this.brickCols; c++) {
+                    this.bricks.push({
+                        x: offset + c * (this.brickW + this.brickPad),
+                        y: this.brickTop + r * (this.brickH + this.brickPad),
+                        w: this.brickW, h: this.brickH,
+                        color: colors[r], alive: true
+                    });
+                }
+            }
+        },
+        loop() {
+            if (this.state !== 'playing') return;
+            this.update();
+            this.draw();
+            this.animFrame = requestAnimationFrame(() => this.loop());
+        },
+        update() {
+            const {ball, paddle, canvas} = this;
+            ball.x += ball.dx; ball.y += ball.dy;
+            // Wall bounces
+            if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx = Math.abs(ball.dx); }
+            if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx = -Math.abs(ball.dx); }
+            if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); }
+            // Bottom - lose life
+            if (ball.y + ball.r > canvas.height) {
+                this.lives--;
+                document.getElementById('breakoutLives').textContent = this.lives;
+                if (this.lives <= 0) { this.endGame(false); return; }
+                this.resetBall();
+                return;
+            }
+            // Paddle collision
+            const py = canvas.height - 24;
+            if (ball.dy > 0 && ball.y + ball.r >= py && ball.y + ball.r <= py + paddle.h + 4 &&
+                ball.x >= paddle.x && ball.x <= paddle.x + paddle.w) {
+                ball.dy = -Math.abs(ball.dy);
+                // Angle based on hit position
+                const hitPos = (ball.x - paddle.x) / paddle.w; // 0 to 1
+                ball.dx = (hitPos - 0.5) * 7;
+                ball.y = py - ball.r;
+            }
+            // Brick collision
+            for (const b of this.bricks) {
+                if (!b.alive) continue;
+                if (ball.x + ball.r > b.x && ball.x - ball.r < b.x + b.w &&
+                    ball.y + ball.r > b.y && ball.y - ball.r < b.y + b.h) {
+                    b.alive = false;
+                    ball.dy = -ball.dy;
+                    this.score += 10;
+                    document.getElementById('breakoutScore').textContent = this.score;
+                    break;
+                }
+            }
+            // Win check
+            if (this.bricks.every(b => !b.alive)) { this.endGame(true); }
+        },
+        draw() {
+            const {ctx, canvas, paddle, ball, bricks} = this;
+            ctx.fillStyle = '#0a0a18';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Bricks
+            for (const b of bricks) {
+                if (!b.alive) continue;
+                ctx.beginPath();
+                ctx.roundRect(b.x, b.y, b.w, b.h, 3);
+                ctx.fillStyle = b.color;
+                ctx.shadowColor = b.color; ctx.shadowBlur = 6;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            // Paddle
+            const py = canvas.height - 24;
+            ctx.beginPath();
+            ctx.roundRect(paddle.x, py, paddle.w, paddle.h, 4);
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            // Ball
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        },
+        endGame(won) {
+            this.stop();
+            this.state = 'over';
+            document.getElementById('breakoutOverLabel').textContent = won ? 'YOU WIN' : 'GAME OVER';
+            document.getElementById('breakoutOverLabel').style.color = won ? '#00ff88' : '#ff3366';
+            document.getElementById('breakoutFinalScore').textContent = this.score;
+            showScreen('breakoutOver');
+        }
+    };
+
+    /* ============================
+       TIC TAC TOE GAME
+    ============================ */
+    const TicTacToe = {
+        board: Array(9).fill(null), current: 'X',
+        scores: {X:0, O:0, D:0}, gameActive: false, aiThinking: false,
+        winLines: [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],
+        init() {},
+        start() {
+            this.board = Array(9).fill(null);
+            this.current = 'X';
+            this.gameActive = true;
+            this.aiThinking = false;
+            this.scores = {X:0, O:0, D:0};
+            this.updateScoreDisplay();
+            this.renderGrid();
+            document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            document.getElementById('tttStatus').style.color = 'var(--accent)';
+            showScreen('tttPlay');
+        },
+        stop() { this.gameActive = false; this.aiThinking = false; },
+        nextRound() {
+            this.board = Array(9).fill(null);
+            this.current = 'X';
+            this.gameActive = true;
+            this.aiThinking = false;
+            this.renderGrid();
+            document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            document.getElementById('tttStatus').style.color = 'var(--accent)';
+        },
+        updateScoreDisplay() {
+            document.getElementById('tttScoreX').textContent = this.scores.X;
+            document.getElementById('tttScoreO').textContent = this.scores.O;
+            document.getElementById('tttScoreD').textContent = this.scores.D;
+        },
+        renderGrid() {
+            const grid = document.getElementById('tttGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'ttt-cell' + (this.board[i] ? ' taken ' + (this.board[i]==='X'?'x-mark':'o-mark') : '');
+                cell.textContent = this.board[i] || '';
+                cell.addEventListener('click', () => this.makeMove(i));
+                grid.appendChild(cell);
+            }
+        },
+        makeMove(idx) {
+            if (!this.gameActive || this.board[idx] || this.current !== 'X' || this.aiThinking) return;
+            this.board[idx] = 'X';
+            this.current = 'O';
+            this.renderGrid();
+            const result = this.checkWin();
+            if (result) { this.handleResult(result); return; }
+            this.aiThinking = true;
+            document.getElementById('tttStatus').textContent = 'AI THINKING...';
+            document.getElementById('tttStatus').style.color = 'var(--danger)';
+            setTimeout(() => {
+                if (!this.gameActive) return;
+                const aiMove = this.getAiMove();
+                this.board[aiMove] = 'O';
+                this.current = 'X';
+                this.aiThinking = false;
+                this.renderGrid();
+                const r = this.checkWin();
+                if (r) { this.handleResult(r); return; }
+                document.getElementById('tttStatus').textContent = 'YOUR TURN';
+                document.getElementById('tttStatus').style.color = 'var(--accent)';
+            }, 400);
+        },
+        getAiMove() {
+            // 30% chance of random move for fun
+            if (Math.random() < 0.3) {
+                const empty = this.board.map((v,i) => v===null?i:-1).filter(i=>i>=0);
+                return empty[Math.floor(Math.random()*empty.length)];
+            }
+            // Minimax
+            let bestScore = -Infinity, bestMove = -1;
+            for (let i = 0; i < 9; i++) {
+                if (this.board[i]) continue;
+                this.board[i] = 'O';
+                const score = this.minimax(false, 0);
+                this.board[i] = null;
+                if (score > bestScore) { bestScore = score; bestMove = i; }
+            }
+            return bestMove;
+        },
+        minimax(isMax, depth) {
+            const w = this.getWinner();
+            if (w === 'O') return 10 - depth;
+            if (w === 'X') return depth - 10;
+            if (this.board.every(c => c !== null)) return 0;
+            if (isMax) {
+                let best = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (this.board[i]) continue;
+                    this.board[i] = 'O';
+                    best = Math.max(best, this.minimax(false, depth+1));
+                    this.board[i] = null;
+                }
+                return best;
+            } else {
+                let best = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (this.board[i]) continue;
+                    this.board[i] = 'X';
+                    best = Math.min(best, this.minimax(true, depth+1));
+                    this.board[i] = null;
+                }
+                return best;
+            }
+        },
+        getWinner() {
+            for (const [a,b,c] of this.winLines) {
+                if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) return this.board[a];
+            }
+            return null;
+        },
+        checkWin() {
+            const w = this.getWinner();
+            if (w) {
+                const line = this.winLines.find(([a,b,c]) => this.board[a]===w && this.board[b]===w && this.board[c]===w);
+                return {winner: w, line};
+            }
+            if (this.board.every(c => c !== null)) return {winner: 'draw', line: null};
+            return null;
+        },
+        handleResult(result) {
+            this.gameActive = false;
+            if (result.winner === 'draw') {
+                this.scores.D++;
+                document.getElementById('tttStatus').textContent = 'DRAW';
+                document.getElementById('tttStatus').style.color = 'var(--muted)';
+            } else if (result.winner === 'X') {
+                this.scores.X++;
+                document.getElementById('tttStatus').textContent = 'YOU WIN';
+                document.getElementById('tttStatus').style.color = 'var(--accent)';
+                if (result.line) this.highlightWin(result.line);
+            } else {
+                this.scores.O++;
+                document.getElementById('tttStatus').textContent = 'AI WINS';
+                document.getElementById('tttStatus').style.color = 'var(--danger)';
+                if (result.line) this.highlightWin(result.line);
+            }
+            this.updateScoreDisplay();
+        },
+        highlightWin(line) {
+            const cells = document.getElementById('tttGrid').children;
+            line.forEach(i => cells[i].classList.add('win-cell'));
+        }
+    };
+
+    /* ============================
+       REACTION TEST GAME
+    ============================ */
+    const ReactionGame = {
+        state: 'idle', timeout: null, startTime: 0,
+        best: Infinity, times: [],
+        init() {},
+        start() {
+            showScreen('reactionPlay');
+            this.resetZone('idle', 'CLICK TO BEGIN', 'var(--muted)');
+            document.getElementById('reactionBest').textContent = '';
+            document.getElementById('reactionHistory').innerHTML = '';
+            this.times = [];
+        },
+        stop() {
+            if (this.timeout) { clearTimeout(this.timeout); this.timeout = null; }
+            this.state = 'idle';
+        },
+        resetZone(cls, text, color) {
+            const zone = document.getElementById('reactionZone');
+            zone.className = 'reaction-zone ' + cls;
+            const txt = document.getElementById('reactionText');
+            txt.textContent = text;
+            txt.style.color = color;
+            // Remove extra elements
+            zone.querySelectorAll('.reaction-time,.reaction-unit').forEach(e => e.remove());
+        },
+        handleClick() {
+            const zone = document.getElementById('reactionZone');
+            if (this.state === 'idle') {
+                // Start waiting
+                this.state = 'waiting';
+                this.resetZone('waiting', 'WAIT FOR GREEN...', 'var(--danger)');
+                const delay = 1500 + Math.random() * 3500;
+                this.timeout = setTimeout(() => {
+                    this.state = 'ready';
+                    this.startTime = performance.now();
+                    this.resetZone('ready', 'CLICK NOW!', 'var(--accent)');
+                }, delay);
+            } else if (this.state === 'waiting') {
+                // Too early
+                clearTimeout(this.timeout);
+                this.state = 'idle';
+                this.resetZone('too-early', 'TOO EARLY! CLICK TO TRY AGAIN', 'var(--warning)');
+            } else if (this.state === 'ready') {
+                // Measure reaction
+                const elapsed = Math.round(performance.now() - this.startTime);
+                this.state = 'idle';
+                this.times.push(elapsed);
+                if (elapsed < this.best) this.best = elapsed;
+                const zone = document.getElementById('reactionZone');
+                zone.className = 'reaction-zone result';
+                zone.innerHTML = `
+                    <div class="reaction-text" style="color:var(--muted)">YOUR REACTION TIME</div>
+                    <div class="reaction-time">${elapsed}</div>
+                    <div class="reaction-unit">MILLISECONDS</div>
+                `;
+                // Best
+                const bestEl = document.getElementById('reactionBest');
+                bestEl.textContent = 'BEST: ' + this.best + 'ms';
+                // History
+                this.renderHistory();
+            }
+        },
+        renderHistory() {
+            const el = document.getElementById('reactionHistory');
+            el.innerHTML = '';
+            this.times.slice(-8).forEach((t, i) => {
+                const tag = document.createElement('span');
+                tag.style.cssText = `background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.6rem;font-family:'Orbitron';font-size:0.65rem;letter-spacing:1px;color:var(--muted)`;
+                tag.textContent = t + 'ms';
+                if (t === this.best) tag.style.color = 'var(--warning)';
+                el.appendChild(tag);
+            });
+        }
+    };
+
+    /* ============================
+       INIT
+    ============================ */
+    document.addEventListener('DOMContentLoaded', () => {
+        BgParticles.init();
+        MagicCursor.init();
+        SnakeGame.init();
+        MemoryGame.init();
+        BreakoutGame.init();
+        TicTacToe.init();
+        ReactionGame.init();
+    });
+    </script>
+</body>
+</html>

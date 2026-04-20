@@ -199,7 +199,7 @@
         }
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
         }
         .game-card {
@@ -385,6 +385,27 @@
         .ttt-scores div { text-align: center; }
         .ttt-scores .label { color: var(--muted); margin-bottom: 0.2rem; }
         .ttt-scores .val { font-size: 1.2rem; font-weight: 700; }
+        .ttt-mode-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0.8rem; width: 100%; max-width: 320px; margin: 0 auto;
+        }
+        .ttt-mode-btn {
+            background: var(--card); border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 1.2rem 0.8rem; color: var(--text);
+            cursor: none; display: flex; flex-direction: column;
+            align-items: center; gap: 0.4rem; transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .ttt-mode-btn i { font-size: 1.4rem; color: var(--warning); }
+        .ttt-mode-btn .mode-title { font-weight: 600; font-size: 0.95rem; letter-spacing: 1px; }
+        .ttt-mode-btn .mode-label {
+            font-family: 'Orbitron', sans-serif; font-size: 0.6rem;
+            letter-spacing: 2px; color: var(--accent);
+        }
+        .ttt-mode-btn:hover {
+            border-color: var(--warning); background: rgba(255,170,0,0.05);
+            transform: translateY(-2px);
+        }
 
         /* Reaction Game */
         .reaction-zone {
@@ -409,6 +430,139 @@
         }
         .reaction-unit { font-size: 0.8rem; color: var(--muted); letter-spacing: 2px; }
         .reaction-best { font-size: 0.8rem; color: var(--warning); margin-top: 0.8rem; letter-spacing: 1px; }
+
+        /* ===== NEW GAMES CSS ===== */
+
+        /* 2048 */
+        .grid-2048 {
+            display: grid; grid-template-columns: repeat(4,1fr);
+            gap: 8px; width: 100%; max-width: 340px; padding: 10px;
+            background: #13132a; border-radius: 12px; border: 1px solid var(--border);
+        }
+        .tile-2048 {
+            aspect-ratio: 1; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif; font-weight: 900;
+            background: #1a1a35; transition: all 0.12s;
+        }
+        .tile-2048.pop { animation: tilePop 0.2s ease; }
+        @keyframes tilePop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+        .g2048-controls {
+            display: flex; gap: 0.5rem; margin-top: 0.8rem;
+        }
+
+        /* Whack-a-Mole */
+        .mole-grid {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 10px; width: 100%; max-width: 300px;
+        }
+        .mole-hole {
+            aspect-ratio: 1; background: #13132a; border-radius: 50%;
+            border: 2px solid var(--border); position: relative;
+            overflow: hidden; cursor: none;
+        }
+        .mole {
+            position: absolute; bottom: -100%; left: 50%; transform: translateX(-50%);
+            width: 65%; height: 65%; background: radial-gradient(circle at 50% 40%, #c49a3c, #8B6914);
+            border-radius: 50% 50% 40% 40%; transition: bottom 0.12s ease-out;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; color: #3a2800;
+        }
+        .mole.active { bottom: 17%; }
+        .mole-hit {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 700;
+            color: var(--accent); pointer-events: none; z-index: 5;
+            animation: hitFloat 0.6s ease-out forwards;
+        }
+        @keyframes hitFloat { 0%{opacity:1;transform:translate(-50%,-50%)} 100%{opacity:0;transform:translate(-50%,-120%)} }
+
+        /* Simon Says */
+        .simon-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; width: 240px; height: 240px;
+        }
+        .simon-pad {
+            border-radius: 16px; border: 2px solid transparent;
+            cursor: none; opacity: 0.5; transition: all 0.15s;
+        }
+        .simon-pad.lit { opacity: 1; transform: scale(1.06); border-color: rgba(255,255,255,0.3); }
+        .simon-pad.pad-0 { background: #cc2244; }
+        .simon-pad.pad-0.lit { background: #ff3366; box-shadow: 0 0 30px rgba(255,51,102,0.6); }
+        .simon-pad.pad-1 { background: #cc8800; }
+        .simon-pad.pad-1.lit { background: #ffaa00; box-shadow: 0 0 30px rgba(255,170,0,0.6); }
+        .simon-pad.pad-2 { background: #009955; }
+        .simon-pad.pad-2.lit { background: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.6); }
+        .simon-pad.pad-3 { background: #0088bb; }
+        .simon-pad.pad-3.lit { background: #00d4ff; box-shadow: 0 0 30px rgba(0,212,255,0.6); }
+
+        /* Typing Speed */
+        .typing-display {
+            width: 100%; max-width: 460px; min-height: 120px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1rem; font-size: 1.3rem;
+            line-height: 2; color: var(--muted); margin-bottom: 1rem;
+            font-family: 'Rajdhani', sans-serif; font-weight: 500;
+            letter-spacing: 0.5px; word-break: break-all;
+        }
+        .typing-display .tw { transition: color 0.1s; }
+        .typing-display .tw.current { color: var(--text); border-bottom: 2px solid var(--accent); }
+        .typing-display .tw.correct { color: var(--accent); }
+        .typing-display .tw.wrong { color: var(--danger); text-decoration: line-through; }
+        .typing-input {
+            width: 100%; max-width: 460px; padding: 0.8rem 1rem;
+            background: var(--card); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 1.1rem;
+            font-family: 'Rajdhani', sans-serif; outline: none;
+            transition: border-color 0.3s;
+        }
+        .typing-input:focus { border-color: var(--accent); }
+
+        /* Higher/Lower */
+        .hl-cards {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; margin: 1rem 0;
+        }
+        .hl-card {
+            width: 120px; height: 170px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-weight: 900; position: relative;
+            border: 2px solid var(--border); transition: all 0.4s;
+        }
+        .hl-card.current {
+            background: linear-gradient(160deg, #1e1e40, #151530);
+            font-size: 2.8rem; color: var(--text);
+            border-color: var(--warning);
+            box-shadow: 0 0 25px rgba(255,170,0,0.15);
+        }
+        .hl-card.next {
+            background: linear-gradient(160deg, #1a1a35, #111128);
+            font-size: 1.5rem; color: var(--muted);
+        }
+        .hl-card.next.revealed {
+            font-size: 2.8rem; color: var(--text);
+        }
+        .hl-card.next.revealed.correct {
+            border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .hl-card.next.revealed.wrong {
+            border-color: var(--danger); box-shadow: 0 0 20px rgba(255,51,102,0.3);
+        }
+        .hl-card .card-corner {
+            position: absolute; font-size: 0.65rem; color: var(--muted);
+        }
+        .hl-card .card-corner.tl { top: 8px; left: 10px; }
+        .hl-card .card-corner.br { bottom: 8px; right: 10px; transform: rotate(180deg); }
+        .hl-btns { display: flex; gap: 1rem; margin-top: 1rem; }
+        .hl-btn {
+            padding: 0.6rem 2rem; border-radius: 8px; font-family: 'Orbitron';
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
+            border: 1.5px solid var(--border); cursor: none;
+            transition: all 0.3s; background: var(--card); color: var(--text);
+        }
+        .hl-btn:hover { transform: scale(1.05); }
+        .hl-btn.up:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        .hl-btn.down:hover { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 15px rgba(255,51,102,0.3); }
 
         /* Footer */
         footer {
@@ -456,11 +610,11 @@
     <!-- Hero Section -->
     <header class="hero" id="home">
         <h1 class="hero-title">NEXUS ARCADE</h1>
-        <p class="hero-sub">Five games. Zero downloads. Pure adrenaline.</p>
+        <p class="hero-sub">Ten games. Zero downloads. Pure adrenaline.</p>
         <a href="#games" class="hero-cta"><i class="fas fa-gamepad"></i> ENTER THE ARCADE</a>
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-num">5</div>
+                <div class="hero-stat-num">10</div>
                 <div class="hero-stat-label">Games</div>
             </div>
             <div class="hero-stat">
@@ -504,7 +658,7 @@
             <div class="game-card" style="--card-accent:#ffaa00;--card-glow:rgba(255,170,0,0.15);--card-icon-bg:rgba(255,170,0,0.1)">
                 <div class="card-icon"><i class="fas fa-hashtag"></i></div>
                 <h3 class="card-title">TIC TAC TOE</h3>
-                <p class="card-desc">Classic strategy against an AI opponent. You play as X, the AI plays as O. Can you outsmart the machine?</p>
+                <p class="card-desc">Classic strategy against AI or a friend. Choose difficulty and outsmart your opponent. Three in a row wins.</p>
                 <button class="card-play" onclick="ModalManager.open('ttt')"><i class="fas fa-play"></i> PLAY</button>
             </div>
             <!-- Reaction -->
@@ -513,6 +667,41 @@
                 <h3 class="card-title">REACTION TEST</h3>
                 <p class="card-desc">Wait for the green signal, then click as fast as you can. Measure your reaction time in milliseconds.</p>
                 <button class="card-play" onclick="ModalManager.open('reaction')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- 2048 -->
+            <div class="game-card" style="--card-accent:#ffcc00;--card-glow:rgba(255,204,0,0.15);--card-icon-bg:rgba(255,204,0,0.1)">
+                <div class="card-icon"><i class="fas fa-grip"></i></div>
+                <h3 class="card-title">2048</h3>
+                <p class="card-desc">Slide tiles to merge matching numbers. Reach the 2048 tile through strategy and patience. One wrong move and it's over.</p>
+                <button class="card-play" onclick="ModalManager.open('game2048')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Whack-a-Mole -->
+            <div class="game-card" style="--card-accent:#ff66ff;--card-glow:rgba(255,102,255,0.15);--card-icon-bg:rgba(255,102,255,0.1)">
+                <div class="card-icon"><i class="fas fa-hand-back-fist"></i></div>
+                <h3 class="card-title">WHACK-A-MOLE</h3>
+                <p class="card-desc">Moles pop up randomly — whack them before they hide! 30 seconds on the clock. How many can you get?</p>
+                <button class="card-play" onclick="ModalManager.open('whack')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Simon Says -->
+            <div class="game-card" style="--card-accent:#aaff00;--card-glow:rgba(170,255,0,0.15);--card-icon-bg:rgba(170,255,0,0.1)">
+                <div class="card-icon"><i class="fas fa-circle-play"></i></div>
+                <h3 class="card-title">SIMON SAYS</h3>
+                <p class="card-desc">Watch the color sequence, then repeat it. Each round adds one more step. How far can your memory stretch?</p>
+                <button class="card-play" onclick="ModalManager.open('simon')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Typing Speed -->
+            <div class="game-card" style="--card-accent:#ff8866;--card-glow:rgba(255,136,102,0.15);--card-icon-bg:rgba(255,136,102,0.1)">
+                <div class="card-icon"><i class="fas fa-keyboard"></i></div>
+                <h3 class="card-title">TYPING SPEED</h3>
+                <p class="card-desc">Type as many words as you can in 30 seconds. Measures your words-per-minute and accuracy in real time.</p>
+                <button class="card-play" onclick="ModalManager.open('typing')"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+            <!-- Higher/Lower -->
+            <div class="game-card" style="--card-accent:#66ffee;--card-glow:rgba(102,255,238,0.15);--card-icon-bg:rgba(102,255,238,0.1)">
+                <div class="card-icon"><i class="fas fa-arrow-up-arrow-down"></i></div>
+                <h3 class="card-title">HIGHER OR LOWER</h3>
+                <p class="card-desc">A card shows a number. Guess if the next card is higher or lower. Build the longest streak you can.</p>
+                <button class="card-play" onclick="ModalManager.open('higherlower')"><i class="fas fa-play"></i> PLAY</button>
             </div>
         </div>
     </section>
@@ -531,7 +720,7 @@
 
     <!-- Footer -->
     <footer>
-        Built with raw code<span></span>. All games run entirely in your browser, no downloads required. &copy; 2026 Nexus Arcade.
+        Built with raw code. All games run entirely in your browser, no downloads required. &copy; 2026 Nexus Arcade.
     </footer>
 
     <!-- ==================== GAME MODALS ==================== -->
@@ -545,12 +734,10 @@
                 <button class="modal-close" onclick="ModalManager.close('snake')"><i class="fas fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <!-- Start -->
                 <div class="game-screen active" id="snakeStart">
                     <p class="game-info-text">Use <strong style="color:var(--accent)">arrow keys</strong> to control the snake. Eat the green food to grow. Don't hit the walls or yourself!</p>
                     <button class="game-btn" onclick="SnakeGame.start()">START GAME</button>
                 </div>
-                <!-- Play -->
                 <div class="game-screen" id="snakePlay">
                     <div class="game-hud">
                         <div>SCORE: <span id="snakeScore">0</span></div>
@@ -566,7 +753,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Over -->
                 <div class="game-screen" id="snakeOver">
                     <div class="game-over-label" style="color:var(--danger)">GAME OVER</div>
                     <div class="game-over-score" id="snakeFinalScore">0</div>
@@ -652,14 +838,36 @@
             </div>
             <div class="modal-body">
                 <div class="game-screen active" id="tttStart">
-                    <p class="game-info-text">You are <strong style="color:var(--accent)">X</strong>, the AI is <strong style="color:var(--danger)">O</strong>. Click a cell to place your mark. Get three in a row to win.</p>
-                    <button class="game-btn" onclick="TicTacToe.start()">START GAME</button>
+                    <p class="game-info-text" style="margin-bottom:1.2rem">Choose your game mode</p>
+                    <div class="ttt-mode-grid">
+                        <button class="ttt-mode-btn" onclick="TicTacToe.start('easy')">
+                            <i class="fas fa-robot"></i>
+                            <span class="mode-title">VS AI</span>
+                            <span class="mode-label">EASY</span>
+                        </button>
+                        <button class="ttt-mode-btn" onclick="TicTacToe.start('medium')">
+                            <i class="fas fa-robot"></i>
+                            <span class="mode-title">VS AI</span>
+                            <span class="mode-label">MEDIUM</span>
+                        </button>
+                        <button class="ttt-mode-btn" onclick="TicTacToe.start('hard')">
+                            <i class="fas fa-robot"></i>
+                            <span class="mode-title">VS AI</span>
+                            <span class="mode-label">HARD</span>
+                        </button>
+                        <button class="ttt-mode-btn" onclick="TicTacToe.start('friend')">
+                            <i class="fas fa-user-group"></i>
+                            <span class="mode-title">VS FRIEND</span>
+                            <span class="mode-label">OFFLINE</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="game-screen" id="tttPlay">
+                    <div id="tttModeLabel" style="font-family:'Orbitron';font-size:0.6rem;letter-spacing:2px;color:var(--muted);margin-bottom:0.5rem"></div>
                     <div class="ttt-scores">
-                        <div><div class="label">YOU (X)</div><div class="val" style="color:var(--accent)" id="tttScoreX">0</div></div>
+                        <div><div class="label" id="tttLabelX">YOU (X)</div><div class="val" style="color:var(--accent)" id="tttScoreX">0</div></div>
                         <div><div class="label">DRAWS</div><div class="val" style="color:var(--muted)" id="tttScoreD">0</div></div>
-                        <div><div class="label">AI (O)</div><div class="val" style="color:var(--danger)" id="tttScoreO">0</div></div>
+                        <div><div class="label" id="tttLabelO">AI (O)</div><div class="val" style="color:var(--danger)" id="tttScoreO">0</div></div>
                     </div>
                     <div id="tttStatus" style="font-family:'Orbitron';font-size:0.75rem;letter-spacing:2px;color:var(--accent);margin-bottom:0.8rem">YOUR TURN</div>
                     <div class="ttt-grid" id="tttGrid"></div>
@@ -684,6 +892,197 @@
                     </div>
                     <div class="reaction-best" id="reactionBest"></div>
                     <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center" id="reactionHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2048 MODAL -->
+    <div class="game-modal" id="game2048Modal">
+        <div class="modal-overlay" onclick="ModalManager.close('game2048')"></div>
+        <div class="modal-content" style="max-width:420px">
+            <div class="modal-header">
+                <h2 style="color:#ffcc00">2048</h2>
+                <button class="modal-close" onclick="ModalManager.close('game2048')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="game2048Start">
+                    <p class="game-info-text">Use <strong style="color:#ffcc00">arrow keys</strong> or <strong style="color:#ffcc00">swipe</strong> to slide tiles. Merge matching numbers to reach 2048. Plan your moves carefully!</p>
+                    <button class="game-btn" onclick="Game2048.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="game2048Play">
+                    <div class="game-hud">
+                        <div>SCORE: <span id="g2048Score">0</span></div>
+                        <div>BEST: <span id="g2048Best">0</span></div>
+                    </div>
+                    <div class="grid-2048" id="grid2048"></div>
+                    <div class="g2048-controls">
+                        <button class="game-btn-secondary" onclick="Game2048.restart()">NEW GAME</button>
+                    </div>
+                </div>
+                <div class="game-screen" id="game2048Over">
+                    <div class="game-over-label" id="g2048OverLabel" style="color:#ffcc00">GAME OVER</div>
+                    <div class="game-over-score" id="g2048FinalScore">0</div>
+                    <div class="game-over-label">POINTS</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="Game2048.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('game2048')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHACK-A-MOLE MODAL -->
+    <div class="game-modal" id="whackModal">
+        <div class="modal-overlay" onclick="ModalManager.close('whack')"></div>
+        <div class="modal-content" style="max-width:420px">
+            <div class="modal-header">
+                <h2 style="color:#ff66ff">WHACK-A-MOLE</h2>
+                <button class="modal-close" onclick="ModalManager.close('whack')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="whackStart">
+                    <p class="game-info-text">Click on moles as they pop up from their holes. You have <strong style="color:#ff66ff">30 seconds</strong> to score as many hits as possible.</p>
+                    <button class="game-btn" onclick="WhackGame.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="whackPlay">
+                    <div class="game-hud">
+                        <div>SCORE: <span id="whackScore">0</span></div>
+                        <div>TIME: <span id="whackTime">30</span>s</div>
+                    </div>
+                    <div class="mole-grid" id="moleGrid"></div>
+                </div>
+                <div class="game-screen" id="whackOver">
+                    <div class="game-over-label" style="color:#ff66ff">TIME'S UP</div>
+                    <div class="game-over-score" id="whackFinalScore">0</div>
+                    <div class="game-over-label">MOLES WHACKED</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="WhackGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('whack')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIMON SAYS MODAL -->
+    <div class="game-modal" id="simonModal">
+        <div class="modal-overlay" onclick="ModalManager.close('simon')"></div>
+        <div class="modal-content" style="max-width:420px">
+            <div class="modal-header">
+                <h2 style="color:#aaff00">SIMON SAYS</h2>
+                <button class="modal-close" onclick="ModalManager.close('simon')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="simonStart">
+                    <p class="game-info-text">Watch the colored pads flash in sequence, then repeat the pattern. Each round adds one more step. You have <strong style="color:#aaff00">3 lives</strong>.</p>
+                    <button class="game-btn" onclick="SimonGame.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="simonPlay">
+                    <div class="game-hud">
+                        <div>ROUND: <span id="simonRound">0</span></div>
+                        <div>LIVES: <span id="simonLives">3</span></div>
+                    </div>
+                    <div id="simonStatus" style="font-family:'Orbitron';font-size:0.75rem;letter-spacing:2px;color:var(--muted);margin-bottom:1rem">WATCH CAREFULLY</div>
+                    <div class="simon-grid" id="simonGrid">
+                        <button class="simon-pad pad-0" onclick="SimonGame.input(0)"></button>
+                        <button class="simon-pad pad-1" onclick="SimonGame.input(1)"></button>
+                        <button class="simon-pad pad-2" onclick="SimonGame.input(2)"></button>
+                        <button class="simon-pad pad-3" onclick="SimonGame.input(3)"></button>
+                    </div>
+                </div>
+                <div class="game-screen" id="simonOver">
+                    <div class="game-over-label" style="color:#aaff00">GAME OVER</div>
+                    <div class="game-over-score" id="simonFinalRound">0</div>
+                    <div class="game-over-label">ROUNDS COMPLETED</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="SimonGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('simon')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TYPING SPEED MODAL -->
+    <div class="game-modal" id="typingModal">
+        <div class="modal-overlay" onclick="ModalManager.close('typing')"></div>
+        <div class="modal-content" style="max-width:540px">
+            <div class="modal-header">
+                <h2 style="color:#ff8866">TYPING SPEED</h2>
+                <button class="modal-close" onclick="ModalManager.close('typing')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="typingStart">
+                    <p class="game-info-text">Type the displayed words as fast as you can. You have <strong style="color:#ff8866">30 seconds</strong>. Results show your WPM and accuracy.</p>
+                    <button class="game-btn" onclick="TypingGame.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="typingPlay">
+                    <div class="game-hud">
+                        <div>TIME: <span id="typingTime">30</span>s</div>
+                        <div>WPM: <span id="typingWPM">0</span></div>
+                        <div>ACC: <span id="typingAcc">100</span>%</div>
+                    </div>
+                    <div class="typing-display" id="typingDisplay"></div>
+                    <input type="text" class="typing-input" id="typingInput" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+                <div class="game-screen" id="typingOver">
+                    <div class="game-over-label" style="color:#ff8866">RESULTS</div>
+                    <div style="display:flex;gap:2rem;margin:1rem 0">
+                        <div style="text-align:center">
+                            <div class="game-over-score" id="typingFinalWPM">0</div>
+                            <div class="game-over-label">WPM</div>
+                        </div>
+                        <div style="text-align:center">
+                            <div class="game-over-score" id="typingFinalAcc" style="color:#00d4ff">0</div>
+                            <div class="game-over-label">ACCURACY %</div>
+                        </div>
+                    </div>
+                    <div style="color:var(--muted);font-size:0.9rem">Words typed: <span id="typingFinalWords" style="color:var(--accent)">0</span> / <span id="typingFinalTotal" style="color:var(--text)">0</span> correct</div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="TypingGame.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('typing')">BACK TO ARCADE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIGHER/LOWER MODAL -->
+    <div class="game-modal" id="higherlowerModal">
+        <div class="modal-overlay" onclick="ModalManager.close('higherlower')"></div>
+        <div class="modal-content" style="max-width:440px">
+            <div class="modal-header">
+                <h2 style="color:#66ffee">HIGHER OR LOWER</h2>
+                <button class="modal-close" onclick="ModalManager.close('higherlower')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="game-screen active" id="hlStart">
+                    <p class="game-info-text">A card shows a number from 1 to 99. Guess if the next card will be <strong style="color:var(--accent)">higher</strong> or <strong style="color:var(--danger)">lower</strong>. Wrong guess ends the game.</p>
+                    <button class="game-btn" onclick="HigherLower.start()">START GAME</button>
+                </div>
+                <div class="game-screen" id="hlPlay">
+                    <div class="game-hud">
+                        <div>STREAK: <span id="hlStreak">0</span></div>
+                        <div>BEST: <span id="hlBest">0</span></div>
+                    </div>
+                    <div class="hl-cards">
+                        <div class="hl-card current" id="hlCurrent">
+                            <span class="card-corner tl">NEXUS</span>
+                            <span id="hlCurrentNum">?</span>
+                            <span class="card-corner br">NEXUS</span>
+                        </div>
+                        <div class="hl-card next" id="hlNext">
+                            <span class="card-corner tl">NEXUS</span>
+                            <span id="hlNextNum">?</span>
+                            <span class="card-corner br">NEXUS</span>
+                        </div>
+                    </div>
+                    <div class="hl-btns" id="hlBtns">
+                        <button class="hl-btn up" onclick="HigherLower.guess('higher')"><i class="fas fa-arrow-up"></i> HIGHER</button>
+                        <button class="hl-btn down" onclick="HigherLower.guess('lower')"><i class="fas fa-arrow-down"></i> LOWER</button>
+                    </div>
+                </div>
+                <div class="game-screen" id="hlOver">
+                    <div class="game-over-label" id="hlOverLabel" style="color:var(--danger)">WRONG!</div>
+                    <div class="game-over-score" id="hlFinalStreak">0</div>
+                    <div class="game-over-label">CORRECT STREAK</div>
+                    <div style="margin-top:0.5rem;color:var(--muted);font-size:0.9rem">The number was <span id="hlRevealNum" style="color:var(--warning)">?</span></div>
+                    <button class="game-btn" style="margin-top:1.5rem" onclick="HigherLower.restart()">PLAY AGAIN</button>
+                    <button class="game-btn-secondary" onclick="ModalManager.close('higherlower')">BACK TO ARCADE</button>
                 </div>
             </div>
         </div>
@@ -732,7 +1131,6 @@
                 ctx.fillStyle = `rgba(0,255,136,${p.o})`;
                 ctx.fill();
             }
-            // Connection lines
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -747,7 +1145,6 @@
                         ctx.stroke();
                     }
                 }
-                // Mouse interaction
                 const dx = particles[i].x - mouse.x;
                 const dy = particles[i].y - mouse.y;
                 const dist = Math.sqrt(dx*dx + dy*dy);
@@ -786,14 +1183,13 @@
                 this.spawnBurst(this.mx, this.my);
             });
             document.addEventListener('mouseup', () => this.dot.classList.remove('clicking'));
-            // Hover detection for interactive elements
             document.addEventListener('mouseover', e => {
-                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn')) {
+                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn, .mole-hole, .simon-pad, .hl-btn, .ttt-mode-btn')) {
                     this.ring.classList.add('hovering');
                 }
             });
             document.addEventListener('mouseout', e => {
-                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn')) {
+                if (e.target.closest('button, a, .game-card, .memory-card, .ttt-cell, .reaction-zone, .touch-btn, .mole-hole, .simon-pad, .hl-btn, .ttt-mode-btn')) {
                     this.ring.classList.remove('hovering');
                 }
             });
@@ -850,12 +1246,16 @@
             if (!target) return;
             const modal = document.getElementById(target + 'Modal');
             if (modal) modal.classList.remove('active');
-            // Stop game
             if (target === 'snake') SnakeGame.stop();
             if (target === 'memory') MemoryGame.stop();
             if (target === 'breakout') BreakoutGame.stop();
             if (target === 'reaction') ReactionGame.stop();
             if (target === 'ttt') TicTacToe.stop();
+            if (target === 'game2048') Game2048.stop();
+            if (target === 'whack') WhackGame.stop();
+            if (target === 'simon') SimonGame.stop();
+            if (target === 'typing') TypingGame.stop();
+            if (target === 'higherlower') HigherLower.stop();
             this.current = null;
             document.body.style.overflow = '';
         }
@@ -919,16 +1319,13 @@
             if (this.dir === 'down') head.y++;
             if (this.dir === 'left') head.x--;
             if (this.dir === 'right') head.x++;
-            // Wall collision
             if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) { this.gameOver(); return; }
-            // Self collision
             if (this.snake.some(s => s.x === head.x && s.y === head.y)) { this.gameOver(); return; }
             this.snake.unshift(head);
             if (head.x === this.food.x && head.y === this.food.y) {
                 this.score += 10;
                 document.getElementById('snakeScore').textContent = this.score;
                 this.spawnFood();
-                // Speed up
                 if (this.speed > 60) {
                     this.speed -= 4;
                     clearInterval(this.interval);
@@ -943,14 +1340,12 @@
             const {ctx, canvas, gridSize: g} = this;
             ctx.fillStyle = '#0a0a18';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // Grid lines (subtle)
             ctx.strokeStyle = 'rgba(255,255,255,0.02)';
             ctx.lineWidth = 0.5;
             for (let i = 0; i <= 20; i++) {
                 ctx.beginPath(); ctx.moveTo(i*g, 0); ctx.lineTo(i*g, 400); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(0, i*g); ctx.lineTo(400, i*g); ctx.stroke();
             }
-            // Food
             if (this.food) {
                 const fx = this.food.x * g + g/2, fy = this.food.y * g + g/2;
                 ctx.beginPath();
@@ -960,11 +1355,9 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
-            // Snake
             for (let i = this.snake.length - 1; i >= 0; i--) {
                 const s = this.snake[i];
                 const alpha = 1 - (i / this.snake.length) * 0.6;
-                const r = Math.max(1, g/2 - 2 - (i * 0.3));
                 ctx.beginPath();
                 ctx.roundRect(s.x*g+1, s.y*g+1, g-2, g-2, 4);
                 ctx.fillStyle = i === 0 ? '#00ff88' : `rgba(0,255,136,${alpha})`;
@@ -1001,7 +1394,6 @@
             document.getElementById('memoryMoves').textContent = '0';
             document.getElementById('memoryPairs').textContent = '0';
             document.getElementById('memoryTime').textContent = '0:00';
-            // Build card array
             let pairs = [];
             for (let i = 0; i < 8; i++) {
                 pairs.push({icon: this.icons[i], color: this.colors[i], id: i});
@@ -1017,10 +1409,7 @@
                 document.getElementById('memoryTime').textContent = m + ':' + String(s).padStart(2,'0');
             }, 1000);
         },
-        stop() {
-            if (this.timer) { clearInterval(this.timer); this.timer = null; }
-            this.locked = false;
-        },
+        stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } this.locked = false; },
         restart() { this.start(); },
         shuffle(arr) {
             for (let i = arr.length - 1; i > 0; i--) {
@@ -1113,10 +1502,7 @@
             showScreen('breakoutPlay');
             this.loop();
         },
-        stop() {
-            if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
-            this.state = 'idle';
-        },
+        stop() { if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; } this.state = 'idle'; },
         restart() { this.start(); },
         resetBall() {
             this.ball.x = this.canvas.width / 2;
@@ -1151,11 +1537,9 @@
         update() {
             const {ball, paddle, canvas} = this;
             ball.x += ball.dx; ball.y += ball.dy;
-            // Wall bounces
             if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx = Math.abs(ball.dx); }
             if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx = -Math.abs(ball.dx); }
             if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); }
-            // Bottom - lose life
             if (ball.y + ball.r > canvas.height) {
                 this.lives--;
                 document.getElementById('breakoutLives').textContent = this.lives;
@@ -1163,19 +1547,17 @@
                 this.resetBall();
                 return;
             }
-            // Paddle collision
             const py = canvas.height - 24;
             if (ball.dy > 0 && ball.y + ball.r >= py && ball.y + ball.r <= py + paddle.h + 4 &&
                 ball.x >= paddle.x && ball.x <= paddle.x + paddle.w) {
                 ball.dy = -Math.abs(ball.dy);
-                // Angle based on hit position
-                const hitPos = (ball.x - paddle.x) / paddle.w; // 0 to 1
+                const hitPos = (ball.x - paddle.x) / paddle.w;
                 ball.dx = (hitPos - 0.5) * 7;
                 ball.y = py - ball.r;
             }
-            // Brick collision
             for (const b of this.bricks) {
                 if (!b.alive) continue;
+                                if (!b.alive) continue;
                 if (ball.x + ball.r > b.x && ball.x - ball.r < b.x + b.w &&
                     ball.y + ball.r > b.y && ball.y - ball.r < b.y + b.h) {
                     b.alive = false;
@@ -1185,14 +1567,12 @@
                     break;
                 }
             }
-            // Win check
             if (this.bricks.every(b => !b.alive)) { this.endGame(true); }
         },
         draw() {
             const {ctx, canvas, paddle, ball, bricks} = this;
             ctx.fillStyle = '#0a0a18';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // Bricks
             for (const b of bricks) {
                 if (!b.alive) continue;
                 ctx.beginPath();
@@ -1202,7 +1582,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
-            // Paddle
             const py = canvas.height - 24;
             ctx.beginPath();
             ctx.roundRect(paddle.x, py, paddle.w, paddle.h, 4);
@@ -1210,7 +1589,6 @@
             ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 10;
             ctx.fill();
             ctx.shadowBlur = 0;
-            // Ball
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
             ctx.fillStyle = '#ffffff';
@@ -1229,14 +1607,16 @@
     };
 
     /* ============================
-       TIC TAC TOE GAME
+       TIC TAC TOE GAME (UPDATED)
     ============================ */
     const TicTacToe = {
         board: Array(9).fill(null), current: 'X',
         scores: {X:0, O:0, D:0}, gameActive: false, aiThinking: false,
+        mode: 'easy', // 'easy','medium','hard','friend'
         winLines: [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],
         init() {},
-        start() {
+        start(mode) {
+            this.mode = mode;
             this.board = Array(9).fill(null);
             this.current = 'X';
             this.gameActive = true;
@@ -1244,7 +1624,22 @@
             this.scores = {X:0, O:0, D:0};
             this.updateScoreDisplay();
             this.renderGrid();
-            document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            // Update labels based on mode
+            const modeLabel = document.getElementById('tttModeLabel');
+            const labelX = document.getElementById('tttLabelX');
+            const labelO = document.getElementById('tttLabelO');
+            if (mode === 'friend') {
+                modeLabel.textContent = 'MODE: VS FRIEND';
+                labelX.textContent = 'PLAYER 1 (X)';
+                labelO.textContent = 'PLAYER 2 (O)';
+                document.getElementById('tttStatus').textContent = 'PLAYER 1\'S TURN';
+            } else {
+                const diffName = mode.toUpperCase();
+                modeLabel.textContent = 'MODE: VS AI (' + diffName + ')';
+                labelX.textContent = 'YOU (X)';
+                labelO.textContent = 'AI (O)';
+                document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            }
             document.getElementById('tttStatus').style.color = 'var(--accent)';
             showScreen('tttPlay');
         },
@@ -1255,7 +1650,11 @@
             this.gameActive = true;
             this.aiThinking = false;
             this.renderGrid();
-            document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            if (this.mode === 'friend') {
+                document.getElementById('tttStatus').textContent = 'PLAYER 1\'S TURN';
+            } else {
+                document.getElementById('tttStatus').textContent = 'YOUR TURN';
+            }
             document.getElementById('tttStatus').style.color = 'var(--accent)';
         },
         updateScoreDisplay() {
@@ -1275,35 +1674,58 @@
             }
         },
         makeMove(idx) {
-            if (!this.gameActive || this.board[idx] || this.current !== 'X' || this.aiThinking) return;
-            this.board[idx] = 'X';
-            this.current = 'O';
+            if (!this.gameActive || this.board[idx] || this.aiThinking) return;
+            // In friend mode, any player can click; in AI mode, only X (human)
+            if (this.mode !== 'friend' && this.current !== 'X') return;
+            this.board[idx] = this.current;
+            const prevPlayer = this.current;
+            this.current = this.current === 'X' ? 'O' : 'X';
             this.renderGrid();
             const result = this.checkWin();
             if (result) { this.handleResult(result); return; }
-            this.aiThinking = true;
-            document.getElementById('tttStatus').textContent = 'AI THINKING...';
-            document.getElementById('tttStatus').style.color = 'var(--danger)';
-            setTimeout(() => {
-                if (!this.gameActive) return;
-                const aiMove = this.getAiMove();
-                this.board[aiMove] = 'O';
-                this.current = 'X';
-                this.aiThinking = false;
-                this.renderGrid();
-                const r = this.checkWin();
-                if (r) { this.handleResult(r); return; }
-                document.getElementById('tttStatus').textContent = 'YOUR TURN';
-                document.getElementById('tttStatus').style.color = 'var(--accent)';
-            }, 400);
+            // AI turn
+            if (this.mode !== 'friend' && this.current === 'O') {
+                this.aiThinking = true;
+                document.getElementById('tttStatus').textContent = 'AI THINKING...';
+                document.getElementById('tttStatus').style.color = 'var(--danger)';
+                setTimeout(() => {
+                    if (!this.gameActive) return;
+                    const aiMove = this.getAiMove();
+                    this.board[aiMove] = 'O';
+                    this.current = 'X';
+                    this.aiThinking = false;
+                    this.renderGrid();
+                    const r = this.checkWin();
+                    if (r) { this.handleResult(r); return; }
+                    document.getElementById('tttStatus').textContent = 'YOUR TURN';
+                    document.getElementById('tttStatus').style.color = 'var(--accent)';
+                }, 400);
+            } else if (this.mode === 'friend') {
+                const nextLabel = this.current === 'X' ? 'PLAYER 1\'S TURN' : 'PLAYER 2\'S TURN';
+                const nextColor = this.current === 'X' ? 'var(--accent)' : 'var(--danger)';
+                document.getElementById('tttStatus').textContent = nextLabel;
+                document.getElementById('tttStatus').style.color = nextColor;
+            }
         },
         getAiMove() {
-            // 30% chance of random move for fun
-            if (Math.random() < 0.3) {
-                const empty = this.board.map((v,i) => v===null?i:-1).filter(i=>i>=0);
-                return empty[Math.floor(Math.random()*empty.length)];
+            if (this.mode === 'easy') {
+                // 70% random
+                if (Math.random() < 0.7) return this.randomMove();
+                return this.bestMove();
+            } else if (this.mode === 'medium') {
+                // 40% random
+                if (Math.random() < 0.4) return this.randomMove();
+                return this.bestMove();
+            } else {
+                // hard: always minimax
+                return this.bestMove();
             }
-            // Minimax
+        },
+        randomMove() {
+            const empty = this.board.map((v,i) => v===null?i:-1).filter(i=>i>=0);
+            return empty[Math.floor(Math.random()*empty.length)];
+        },
+        bestMove() {
             let bestScore = -Infinity, bestMove = -1;
             for (let i = 0; i < 9; i++) {
                 if (this.board[i]) continue;
@@ -1356,18 +1778,27 @@
         },
         handleResult(result) {
             this.gameActive = false;
+            const isFriend = this.mode === 'friend';
             if (result.winner === 'draw') {
                 this.scores.D++;
                 document.getElementById('tttStatus').textContent = 'DRAW';
                 document.getElementById('tttStatus').style.color = 'var(--muted)';
             } else if (result.winner === 'X') {
                 this.scores.X++;
-                document.getElementById('tttStatus').textContent = 'YOU WIN';
+                if (isFriend) {
+                    document.getElementById('tttStatus').textContent = 'PLAYER 1 WINS';
+                } else {
+                    document.getElementById('tttStatus').textContent = 'YOU WIN';
+                }
                 document.getElementById('tttStatus').style.color = 'var(--accent)';
                 if (result.line) this.highlightWin(result.line);
             } else {
                 this.scores.O++;
-                document.getElementById('tttStatus').textContent = 'AI WINS';
+                if (isFriend) {
+                    document.getElementById('tttStatus').textContent = 'PLAYER 2 WINS';
+                } else {
+                    document.getElementById('tttStatus').textContent = 'AI WINS';
+                }
                 document.getElementById('tttStatus').style.color = 'var(--danger)';
                 if (result.line) this.highlightWin(result.line);
             }
@@ -1393,23 +1824,18 @@
             document.getElementById('reactionHistory').innerHTML = '';
             this.times = [];
         },
-        stop() {
-            if (this.timeout) { clearTimeout(this.timeout); this.timeout = null; }
-            this.state = 'idle';
-        },
+        stop() { if (this.timeout) { clearTimeout(this.timeout); this.timeout = null; } this.state = 'idle'; },
         resetZone(cls, text, color) {
             const zone = document.getElementById('reactionZone');
             zone.className = 'reaction-zone ' + cls;
             const txt = document.getElementById('reactionText');
             txt.textContent = text;
             txt.style.color = color;
-            // Remove extra elements
             zone.querySelectorAll('.reaction-time,.reaction-unit').forEach(e => e.remove());
         },
         handleClick() {
             const zone = document.getElementById('reactionZone');
             if (this.state === 'idle') {
-                // Start waiting
                 this.state = 'waiting';
                 this.resetZone('waiting', 'WAIT FOR GREEN...', 'var(--danger)');
                 const delay = 1500 + Math.random() * 3500;
@@ -1419,12 +1845,10 @@
                     this.resetZone('ready', 'CLICK NOW!', 'var(--accent)');
                 }, delay);
             } else if (this.state === 'waiting') {
-                // Too early
                 clearTimeout(this.timeout);
                 this.state = 'idle';
                 this.resetZone('too-early', 'TOO EARLY! CLICK TO TRY AGAIN', 'var(--warning)');
             } else if (this.state === 'ready') {
-                // Measure reaction
                 const elapsed = Math.round(performance.now() - this.startTime);
                 this.state = 'idle';
                 this.times.push(elapsed);
@@ -1436,23 +1860,547 @@
                     <div class="reaction-time">${elapsed}</div>
                     <div class="reaction-unit">MILLISECONDS</div>
                 `;
-                // Best
-                const bestEl = document.getElementById('reactionBest');
-                bestEl.textContent = 'BEST: ' + this.best + 'ms';
-                // History
+                document.getElementById('reactionBest').textContent = 'BEST: ' + this.best + 'ms';
                 this.renderHistory();
             }
         },
         renderHistory() {
             const el = document.getElementById('reactionHistory');
             el.innerHTML = '';
-            this.times.slice(-8).forEach((t, i) => {
+            this.times.slice(-8).forEach((t) => {
                 const tag = document.createElement('span');
                 tag.style.cssText = `background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.6rem;font-family:'Orbitron';font-size:0.65rem;letter-spacing:1px;color:var(--muted)`;
                 tag.textContent = t + 'ms';
                 if (t === this.best) tag.style.color = 'var(--warning)';
                 el.appendChild(tag);
             });
+        }
+    };
+
+    /* ============================
+       2048 GAME
+    ============================ */
+    const Game2048 = {
+        grid: [], score: 0, best: 0, state: 'idle',
+        tileColors: {
+            0:'#1a1a35', 2:'#1e2a3a', 4:'#1e3040', 8:'#3a2a1a', 16:'#3a2218',
+            32:'#3a1818', 64:'#3a1010', 128:'#2a3a18', 256:'#1a3a18',
+            512:'#183a2a', 1024:'#183a3a', 2048:'#3a3a10'
+        },
+        tileText: {
+            0:'transparent', 2:'#8899aa', 4:'#99aabb', 8:'#ffcc66',
+            16:'#ffbb44', 32:'#ffaa33', 64:'#ff8822', 128:'#aaff66',
+            256:'#88ff44', 512:'#66ff88', 1024:'#66ffdd', 2048:'#ffff44'
+        },
+        init() {},
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.score = 0;
+            this.grid = Array(16).fill(0);
+            this.addRandomTile();
+            this.addRandomTile();
+            document.getElementById('g2048Score').textContent = '0';
+            document.getElementById('g2048Best').textContent = this.best;
+            this.renderGrid();
+            showScreen('game2048Play');
+        },
+        stop() { this.state = 'idle'; },
+        restart() { this.start(); },
+        addRandomTile() {
+            const empty = this.grid.map((v,i) => v===0?i:-1).filter(i=>i>=0);
+            if (empty.length === 0) return;
+            const idx = empty[Math.floor(Math.random()*empty.length)];
+            this.grid[idx] = Math.random() < 0.9 ? 2 : 4;
+        },
+        renderGrid() {
+            const container = document.getElementById('grid2048');
+            container.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const val = this.grid[i];
+                const tile = document.createElement('div');
+                tile.className = 'tile-2048' + (val ? ' pop' : '');
+                tile.style.background = this.tileColors[val] || '#3a3a10';
+                const fontSize = val >= 1024 ? '1.1rem' : val >= 128 ? '1.3rem' : '1.6rem';
+                tile.style.fontSize = fontSize;
+                tile.style.color = this.tileText[val] || '#ffffff';
+                tile.textContent = val || '';
+                container.appendChild(tile);
+            }
+        },
+        move(dir) {
+            if (this.state !== 'playing') return;
+            const prev = [...this.grid];
+            let moved = false;
+            if (dir === 'left' || dir === 'right') {
+                for (let r = 0; r < 4; r++) {
+                    let row = [this.grid[r*4], this.grid[r*4+1], this.grid[r*4+2], this.grid[r*4+3]];
+                    if (dir === 'right') row.reverse();
+                    row = this.slideRow(row);
+                    if (dir === 'right') row.reverse();
+                    for (let c = 0; c < 4; c++) {
+                        if (this.grid[r*4+c] !== row[c]) moved = true;
+                        this.grid[r*4+c] = row[c];
+                    }
+                }
+            } else {
+                for (let c = 0; c < 4; c++) {
+                    let col = [this.grid[c], this.grid[c+4], this.grid[c+8], this.grid[c+12]];
+                    if (dir === 'down') col.reverse();
+                    col = this.slideRow(col);
+                    if (dir === 'down') col.reverse();
+                    for (let r = 0; r < 4; r++) {
+                        if (this.grid[r*4+c] !== col[r]) moved = true;
+                        this.grid[r*4+c] = col[r];
+                    }
+                }
+            }
+            if (moved) {
+                this.addRandomTile();
+                document.getElementById('g2048Score').textContent = this.score;
+                this.renderGrid();
+                // Check win
+                if (this.grid.includes(2048)) {
+                    this.state = 'over';
+                    if (this.score > this.best) this.best = this.score;
+                    document.getElementById('g2048OverLabel').textContent = 'YOU REACHED 2048!';
+                    document.getElementById('g2048OverLabel').style.color = '#ffcc00';
+                    document.getElementById('g2048FinalScore').textContent = this.score;
+                    showScreen('game2048Over');
+                    return;
+                }
+                // Check game over
+                if (this.isGameOver()) {
+                    this.state = 'over';
+                    if (this.score > this.best) this.best = this.score;
+                    document.getElementById('g2048OverLabel').textContent = 'GAME OVER';
+                    document.getElementById('g2048OverLabel').style.color = '#ff3366';
+                    document.getElementById('g2048FinalScore').textContent = this.score;
+                    showScreen('game2048Over');
+                }
+            }
+        },
+        slideRow(row) {
+            let arr = row.filter(v => v !== 0);
+            for (let i = 0; i < arr.length - 1; i++) {
+                if (arr[i] === arr[i+1]) {
+                    arr[i] *= 2;
+                    this.score += arr[i];
+                    arr.splice(i+1, 1);
+                }
+            }
+            while (arr.length < 4) arr.push(0);
+            return arr;
+        },
+        isGameOver() {
+            if (this.grid.includes(0)) return false;
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    const v = this.grid[r*4+c];
+                    if (c < 3 && v === this.grid[r*4+c+1]) return false;
+                    if (r < 3 && v === this.grid[(r+1)*4+c]) return false;
+                }
+            }
+            return true;
+        }
+    };
+    // 2048 keyboard controls
+    document.addEventListener('keydown', e => {
+        const map = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+        if (map[e.key] && Game2048.state === 'playing') {
+            Game2048.move(map[e.key]);
+            e.preventDefault();
+        }
+    });
+    // 2048 swipe controls
+    (function() {
+        let sx, sy;
+        const c = document.getElementById('grid2048');
+        if (!c) return;
+        c.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+        c.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sx;
+            const dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
+            if (Math.abs(dx) > Math.abs(dy)) {
+                Game2048.move(dx > 0 ? 'right' : 'left');
+            } else {
+                Game2048.move(dy > 0 ? 'down' : 'up');
+            }
+        }, {passive:true});
+    })();
+
+    /* ============================
+       WHACK-A-MOLE GAME
+    ============================ */
+    const WhackGame = {
+        score: 0, timeLeft: 30, timer: null, moleTimer: null,
+        activeMoles: new Set(), state: 'idle',
+        init() {
+            const grid = document.getElementById('moleGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'mole-hole';
+                hole.innerHTML = '<div class="mole" id="mole'+i+'"></div>';
+                hole.addEventListener('click', () => this.whack(i));
+                grid.appendChild(hole);
+            }
+        },
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.score = 0; this.timeLeft = 30;
+            this.activeMoles.clear();
+            document.getElementById('whackScore').textContent = '0';
+            document.getElementById('whackTime').textContent = '30';
+            // Reset all moles
+            for (let i = 0; i < 9; i++) document.getElementById('mole'+i).classList.remove('active');
+            showScreen('whackPlay');
+            this.timer = setInterval(() => {
+                this.timeLeft--;
+                document.getElementById('whackTime').textContent = this.timeLeft;
+                if (this.timeLeft <= 0) this.endGame();
+            }, 1000);
+            this.spawnLoop();
+        },
+        stop() {
+            if (this.timer) { clearInterval(this.timer); this.timer = null; }
+            if (this.moleTimer) { clearTimeout(this.moleTimer); this.moleTimer = null; }
+            this.state = 'idle';
+            this.activeMoles.clear();
+            for (let i = 0; i < 9; i++) {
+                const m = document.getElementById('mole'+i);
+                if (m) m.classList.remove('active');
+            }
+        },
+        restart() { this.start(); },
+        spawnLoop() {
+            if (this.state !== 'playing') return;
+            // Pick a random hole that doesn't have a mole
+            const available = [];
+            for (let i = 0; i < 9; i++) { if (!this.activeMoles.has(i)) available.push(i); }
+            if (available.length > 0) {
+                const idx = available[Math.floor(Math.random()*available.length)];
+                this.activeMoles.add(idx);
+                document.getElementById('mole'+idx).classList.add('active');
+                // Auto-hide after random time
+                const hideTime = 600 + Math.random() * 800;
+                setTimeout(() => {
+                    if (this.activeMoles.has(idx)) {
+                        this.activeMoles.delete(idx);
+                        document.getElementById('mole'+idx).classList.remove('active');
+                    }
+                }, hideTime);
+            }
+            // Next spawn
+            const nextDelay = Math.max(300, 700 - this.score * 15) + Math.random() * 400;
+            this.moleTimer = setTimeout(() => this.spawnLoop(), nextDelay);
+        },
+        whack(idx) {
+            if (this.state !== 'playing' || !this.activeMoles.has(idx)) return;
+            this.activeMoles.delete(idx);
+            document.getElementById('mole'+idx).classList.remove('active');
+            this.score++;
+            document.getElementById('whackScore').textContent = this.score;
+            // Hit feedback
+            const hole = document.getElementById('mole'+idx).parentElement;
+            const hit = document.createElement('div');
+            hit.className = 'mole-hit';
+            hit.textContent = '+1';
+            hole.appendChild(hit);
+            setTimeout(() => hit.remove(), 600);
+        },
+        endGame() {
+            this.stop();
+            document.getElementById('whackFinalScore').textContent = this.score;
+            showScreen('whackOver');
+        }
+    };
+
+    /* ============================
+       SIMON SAYS GAME
+    ============================ */
+    const SimonGame = {
+        sequence: [], playerIndex: 0, round: 0, lives: 3,
+        state: 'idle', showingSequence: false, inputLocked: true,
+        init() {},
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.sequence = [];
+            this.playerIndex = 0;
+            this.round = 0;
+            this.lives = 3;
+            this.showingSequence = false;
+            this.inputLocked = true;
+            document.getElementById('simonRound').textContent = '0';
+            document.getElementById('simonLives').textContent = '3';
+            document.getElementById('simonStatus').textContent = 'WATCH CAREFULLY';
+            document.getElementById('simonStatus').style.color = 'var(--muted)';
+            showScreen('simonPlay');
+            this.nextRound();
+        },
+        stop() { this.state = 'idle'; this.inputLocked = true; this.showingSequence = false; },
+        restart() { this.start(); },
+        nextRound() {
+            this.round++;
+            this.playerIndex = 0;
+            document.getElementById('simonRound').textContent = this.round;
+            this.sequence.push(Math.floor(Math.random()*4));
+            this.showingSequence = true;
+            this.inputLocked = true;
+            document.getElementById('simonStatus').textContent = 'WATCH CAREFULLY';
+            document.getElementById('simonStatus').style.color = 'var(--muted)';
+            // Show sequence with delay
+            let i = 0;
+            const showNext = () => {
+                if (i >= this.sequence.length) {
+                    this.showingSequence = false;
+                    this.inputLocked = false;
+                    document.getElementById('simonStatus').textContent = 'YOUR TURN';
+                    document.getElementById('simonStatus').style.color = 'var(--accent)';
+                    return;
+                }
+                this.flashPad(this.sequence[i], 400);
+                i++;
+                setTimeout(showNext, 600);
+            };
+            setTimeout(showNext, 600);
+        },
+        flashPad(idx, duration) {
+            const pad = document.querySelectorAll('.simon-pad')[idx];
+            pad.classList.add('lit');
+            setTimeout(() => pad.classList.remove('lit'), duration);
+        },
+        input(idx) {
+            if (this.state !== 'playing' || this.inputLocked || this.showingSequence) return;
+            this.flashPad(idx, 200);
+            if (this.sequence[this.playerIndex] === idx) {
+                this.playerIndex++;
+                if (this.playerIndex === this.sequence.length) {
+                    this.inputLocked = true;
+                    document.getElementById('simonStatus').textContent = 'CORRECT!';
+                    document.getElementById('simonStatus').style.color = 'var(--accent)';
+                    setTimeout(() => this.nextRound(), 800);
+                }
+            } else {
+                this.lives--;
+                document.getElementById('simonLives').textContent = this.lives;
+                this.inputLocked = true;
+                if (this.lives <= 0) {
+                    document.getElementById('simonStatus').textContent = 'GAME OVER';
+                    document.getElementById('simonStatus').style.color = 'var(--danger)';
+                    setTimeout(() => {
+                        document.getElementById('simonFinalRound').textContent = this.round - 1;
+                        showScreen('simonOver');
+                    }, 800);
+                } else {
+                    document.getElementById('simonStatus').textContent = 'WRONG! ' + this.lives + ' LIVES LEFT';
+                    document.getElementById('simonStatus').style.color = 'var(--danger)';
+                    // Replay sequence
+                    setTimeout(() => {
+                        this.playerIndex = 0;
+                        this.showingSequence = true;
+                        this.inputLocked = true;
+                        document.getElementById('simonStatus').textContent = 'WATCH AGAIN';
+                        document.getElementById('simonStatus').style.color = 'var(--muted)';
+                        let i = 0;
+                        const showNext = () => {
+                            if (i >= this.sequence.length) {
+                                this.showingSequence = false;
+                                this.inputLocked = false;
+                                document.getElementById('simonStatus').textContent = 'YOUR TURN';
+                                document.getElementById('simonStatus').style.color = 'var(--accent)';
+                                return;
+                            }
+                            this.flashPad(this.sequence[i], 400);
+                            i++;
+                            setTimeout(showNext, 600);
+                        };
+                        setTimeout(showNext, 600);
+                    }, 1000);
+                }
+            }
+        }
+    };
+
+    /* ============================
+       TYPING SPEED GAME
+    ============================ */
+    const TypingGame = {
+        words: ['the','be','to','of','and','a','in','that','have','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us','great','between','need','large','under','never','same','last','long','world','still','own','find','here','thing','many','right','begin','since','before','little','end','real','life','keep','much','place','point','hand','high','start','might','story','far','run','close','move','light','help','change','should','every','play','home','night','live','believe','away','turn','left','learn','read','old','next','few','hard','open','bring','both','letter','house','morning','write','show','part','against','name','build','clear','city','country','head','stand','grow','small','feel','watch','follow','stop','seem','walk','young','important','talk','often','enough','early','strong','during','family','together','sometimes','almost','always','problem','love','another','question','school','water','food','sun','tree','earth','river','mountain','ocean','fire','air','power','music','color','dream','game','space','book','door','window','table','chair','phone','computer','picture','animal','garden','flower','bird','fish','dog','cat','rain','snow','wind','star','moon','sky','cloud','road','street','bridge','wall','floor','glass','stone','gold','silver','iron','wood','paper','money','child','friend','mother','father','sister','brother','daughter','son'],
+        currentWords: [], wordIndex: 0, correct: 0, wrong: 0, total: 0,
+        timeLeft: 30, timer: null, state: 'idle',
+        init() {
+            const input = document.getElementById('typingInput');
+            input.addEventListener('input', () => this.handleInput());
+        },
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.wordIndex = 0; this.correct = 0; this.wrong = 0; this.total = 0;
+            this.timeLeft = 30;
+            // Pick 40 random words
+            this.currentWords = [];
+            for (let i = 0; i < 40; i++) {
+                this.currentWords.push(this.words[Math.floor(Math.random()*this.words.length)]);
+            }
+            document.getElementById('typingTime').textContent = '30';
+            document.getElementById('typingWPM').textContent = '0';
+            document.getElementById('typingAcc').textContent = '100';
+            this.renderWords();
+            const input = document.getElementById('typingInput');
+            input.value = '';
+            input.focus();
+            showScreen('typingPlay');
+            this.timer = setInterval(() => {
+                this.timeLeft--;
+                document.getElementById('typingTime').textContent = this.timeLeft;
+                // Update WPM
+                const elapsed = 30 - this.timeLeft;
+                if (elapsed > 0) {
+                    const wpm = Math.round((this.correct / elapsed) * 60);
+                    document.getElementById('typingWPM').textContent = wpm;
+                }
+                if (this.timeLeft <= 0) this.endGame();
+            }, 1000);
+        },
+        stop() {
+            if (this.timer) { clearInterval(this.timer); this.timer = null; }
+            this.state = 'idle';
+        },
+        restart() { this.start(); },
+        renderWords() {
+            const display = document.getElementById('typingDisplay');
+            display.innerHTML = '';
+            this.currentWords.forEach((w, i) => {
+                const span = document.createElement('span');
+                span.className = 'tw';
+                span.textContent = w + ' ';
+                if (i === this.wordIndex) span.classList.add('current');
+                display.appendChild(span);
+            });
+        },
+        handleInput() {
+            if (this.state !== 'playing') return;
+            const input = document.getElementById('typingInput');
+            const typed = input.value.trim();
+            if (!typed) return;
+            const currentWord = this.currentWords[this.wordIndex];
+            // Check if the typed text ends with a space (word complete)
+            if (typed.endsWith(' ') || typed === currentWord) {
+                this.total++;
+                const userWord = typed.trim();
+                if (userWord === currentWord) {
+                    this.correct++;
+                    this.markWord(this.wordIndex, 'correct');
+                } else {
+                    this.wrong++;
+                    this.markWord(this.wordIndex, 'wrong');
+                }
+                this.wordIndex++;
+                input.value = '';
+                // Update accuracy
+                const acc = this.total > 0 ? Math.round((this.correct / this.total) * 100) : 100;
+                document.getElementById('typingAcc').textContent = acc;
+                // Update WPM
+                const elapsed = 30 - this.timeLeft;
+                if (elapsed > 0) {
+                    const wpm = Math.round((this.correct / elapsed) * 60);
+                    document.getElementById('typingWPM').textContent = wpm;
+                }
+                // Scroll display
+                const display = document.getElementById('typingDisplay');
+                const spans = display.querySelectorAll('.tw');
+                spans.forEach((s, i) => {
+                    s.classList.remove('current');
+                    if (i === this.wordIndex) s.classList.add('current');
+                });
+                if (this.wordIndex >= this.currentWords.length) this.endGame();
+            }
+        },
+        markWord(idx, cls) {
+            const display = document.getElementById('typingDisplay');
+            const spans = display.querySelectorAll('.tw');
+            if (spans[idx]) {
+                spans[idx].classList.remove('current');
+                spans[idx].classList.add(cls);
+            }
+        },
+        endGame() {
+            this.stop();
+            const elapsed = 30 - this.timeLeft;
+            const wpm = elapsed > 0 ? Math.round((this.correct / elapsed) * 60) : 0;
+            const acc = this.total > 0 ? Math.round((this.correct / this.total) * 100) : 100;
+            document.getElementById('typingFinalWPM').textContent = wpm;
+            document.getElementById('typingFinalAcc').textContent = acc;
+            document.getElementById('typingFinalWords').textContent = this.correct;
+            document.getElementById('typingFinalTotal').textContent = this.total;
+            showScreen('typingOver');
+        }
+    };
+
+    /* ============================
+       HIGHER OR LOWER GAME
+    ============================ */
+    const HigherLower = {
+        currentNum: 0, nextNum: 0, streak: 0, best: 0, state: 'idle',
+        init() {},
+        start() {
+            this.stop();
+            this.state = 'playing';
+            this.streak = 0;
+            this.currentNum = Math.floor(Math.random()*98)+1;
+            this.nextNum = Math.floor(Math.random()*98)+1;
+            document.getElementById('hlStreak').textContent = '0';
+            document.getElementById('hlBest').textContent = this.best;
+            document.getElementById('hlCurrentNum').textContent = this.currentNum;
+            document.getElementById('hlNextNum').textContent = '?';
+            document.getElementById('hlNext').className = 'hl-card next';
+            document.getElementById('hlBtns').style.display = 'flex';
+            showScreen('hlPlay');
+        },
+        stop() { this.state = 'idle'; },
+        restart() { this.start(); },
+        guess(choice) {
+            if (this.state !== 'playing') return;
+            const nextCard = document.getElementById('hlNext');
+            const nextNumEl = document.getElementById('hlNextNum');
+            nextNumEl.textContent = this.nextNum;
+            nextCard.classList.add('revealed');
+            document.getElementById('hlBtns').style.display = 'none';
+
+            let correct = false;
+            if (choice === 'higher' && this.nextNum >= this.currentNum) correct = true;
+            if (choice === 'lower' && this.nextNum <= this.currentNum) correct = true;
+            // Same number counts as correct for both
+
+            if (correct) {
+                nextCard.classList.add('correct');
+                this.streak++;
+                if (this.streak > this.best) this.best = this.streak;
+                document.getElementById('hlStreak').textContent = this.streak;
+                document.getElementById('hlBest').textContent = this.best;
+                // Next card
+                setTimeout(() => {
+                    this.currentNum = this.nextNum;
+                    this.nextNum = Math.floor(Math.random()*98)+1;
+                    document.getElementById('hlCurrentNum').textContent = this.currentNum;
+                    nextNumEl.textContent = '?';
+                    nextCard.className = 'hl-card next';
+                    document.getElementById('hlBtns').style.display = 'flex';
+                }, 500);
+            } else {
+                nextCard.classList.add('wrong');
+                setTimeout(() => {
+                    document.getElementById('hlOverLabel').textContent = 'WRONG!';
+                    document.getElementById('hlOverLabel').style.color = 'var(--danger)';
+                    document.getElementById('hlFinalStreak').textContent = this.streak;
+                    document.getElementById('hlRevealNum').textContent = this.nextNum;
+                    showScreen('hlOver');
+                }, 600);
+            }
         }
     };
 
@@ -1467,7 +2415,12 @@
         BreakoutGame.init();
         TicTacToe.init();
         ReactionGame.init();
+        Game2048.init();
+        WhackGame.init();
+        SimonGame.init();
+        TypingGame.init();
+        HigherLower.init();
     });
     </script>
 </body>
-</html>
+                        </html>
